@@ -14,10 +14,10 @@
 #  * limitations under the License.
 #  *******************************************************************************/
 # Building:
-#   podman build -t containerdiagsmall .
-#   podman tag $(podman images | grep localhost/containerdiagsmall | awk '{print $3}') quay.io/kgibm/containerdiagsmall
+#   podman build -t containerdiag .
+#   podman tag $(podman images | grep localhost/containerdiag | awk '{print $3}') quay.io/kgibm/containerdiag
 #   podman login quay.io
-#   podman push quay.io/kgibm/containerdiagsmall
+#   podman push quay.io/kgibm/containerdiag
 #
 # Notes:
 #   * As of writing this note, this image is about 440MB
@@ -77,7 +77,7 @@ RUN mkdir -p /opt/java/11/ && \
     mv /opt/jdk* /opt/java/11/semeru && \
     ln -s /opt/java/11/semeru/bin/java /usr/local/bin/
 
-COPY *.sh *.awk /opt/
+COPY scripts/*.sh scripts/*.awk /opt/
 
 RUN get_git() { \
       wget -q -O /tmp/$1_$2_master.zip https://github.com/$1/$2/archive/master.zip; \
