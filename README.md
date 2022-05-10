@@ -21,3 +21,7 @@ Replace `$NODE` with the node name and `$POD` with the pod name:
 ```
 oc debug node/$NODE -t --image=quay.io/kgibm/containerdiagsmall -- libertyperf.sh $POD
 ```
+
+## Support
+
+This image is provided as is without any warranty or support but we will do our best to respond to issues as time permits.
