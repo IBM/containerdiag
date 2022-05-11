@@ -15,9 +15,9 @@
 #  *******************************************************************************/
 # Building:
 #   podman build -t containerdiag .
-#   podman tag $(podman images | grep localhost/containerdiag | awk '{print $3}') quay.io/kgibm/containerdiag
+#   podman tag $(podman images | grep "localhost/containerdiag[ \t]" | awk '{print $3}') quay.io/ibm/containerdiag
 #   podman login quay.io
-#   podman push quay.io/kgibm/containerdiag
+#   podman push quay.io/ibm/containerdiag
 #
 # Notes:
 #   * As of writing this note, this image is about 440MB
