@@ -97,6 +97,7 @@ RUN get_git() { \
     chmod a+x /opt/podfspath.sh && ln -s /opt/podfspath.sh /usr/local/bin/ && \
     chmod a+x /opt/podfsrm.sh && ln -s /opt/podfsrm.sh /usr/local/bin/ && \
     chmod a+x /opt/podinfo.sh && ln -s /opt/podinfo.sh /usr/local/bin/ && \
-    chmod a+x /opt/run.sh && ln -s /opt/run.sh /usr/local/bin/
+    chmod a+x /opt/run.sh && ln -s /opt/run.sh /usr/local/bin/ && \
+    chmod a+x /opt/tcpdump.sh && ln -s /opt/tcpdump.sh /usr/local/bin/
 
 # Defer to the ENTRYPOINT/CMD of Fedora which is bash
