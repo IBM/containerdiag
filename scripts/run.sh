@@ -36,7 +36,7 @@ VERBOSE=0
 SKIPSTATS=0
 DELAY=30
 NODOWNLOAD=0
-OUTPUTFILE="stdouterr.log"
+OUTPUTFILE="run_stdouterr.log"
 
 OPTIND=1
 while getopts "d:hnsv?" opt; do
