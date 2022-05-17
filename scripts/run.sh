@@ -21,10 +21,11 @@
 # oc debug node/$NODE -t --image=quay.io/kgibm/containerdiagsmall -- run.sh sh -c 'echo "Hello World"'
 
 usage() {
-  printf "Usage: %s [-sv] [-d DELAY] COMMAND [ARGUMENTS]\n" "$(basename "${0}")"
+  printf "Usage: %s [-nsv] [-d DELAY] COMMAND [ARGUMENTS]\n" "$(basename "${0}")"
   cat <<"EOF"
              -d: DELAY in seconds between checking command and download completion.
-             -s: Skip statistics collection
+             -n: No download necessary
+             -q: Skip waiting for download
              -v: verbose output to stderr
 EOF
   exit 2
@@ -34,16 +35,20 @@ DESTDIR="/tmp"
 VERBOSE=0
 SKIPSTATS=0
 DELAY=30
+NODOWNLOAD=0
 OUTPUTFILE="stdouterr.log"
 
 OPTIND=1
-while getopts "d:hsv?" opt; do
+while getopts "d:hnsv?" opt; do
   case "$opt" in
     d)
       DELAY="${OPTARG}"
       ;;
     h|\?)
       usage
+      ;;
+    n)
+      NODOWNLOAD=1
       ;;
     s)
       SKIPSTATS=1
@@ -170,46 +175,51 @@ chroot /host df -h &> node/info/df.txt
 chroot /host systemctl list-units &> node/info/systemctlunits.txt
 chroot /host systemd-cgls &> node/info/cgroups.txt
 
-printInfo "containerdiag: All data gathering complete. Packaging for download."
+printInfo "containerdiag: All data gathering complete."
 
-# After we're done, we want to package everything up into a tgz
-# and show an example command of how to download it.
-TARFILE="${TARGETDIR%/}.tar.gz"
-tar -czf "${TARFILE}" -C "${TARGETDIR}" . || exit 5
+if [ "${NODOWNLOAD}" -eq "0" ]; then
+  printInfo "containerdiag: Packaging for download."
 
-rm -rf "${TARGETDIR}"
+  # After we're done, we want to package everything up into a tgz
+  # and show an example command of how to download it.
+  TARFILE="${TARGETDIR%/}.tar.gz"
+  tar -czf "${TARFILE}" -C "${TARGETDIR}" . || exit 5
 
-echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] Finished with output in ${TARFILE}"
+  rm -rf "${TARGETDIR}"
 
-# Now we need to figure out our own pod name and namespace to create the
-# right download command. We touch a file in our temp directory which we'll
-# then search for.
-touch /tmp/${TMPNAME}
+  # Stop using printInfo since we're packaging that output
+  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] Finished with output in ${TARFILE}"
 
-[ "${VERBOSE}" -eq "1" ] && printVerbose "Touched /tmp/${TMPNAME}"
+  # Now we need to figure out our own pod name and namespace to create the
+  # right download command. We touch a file in our temp directory which we'll
+  # then search for.
+  touch /tmp/${TMPNAME}
 
-DEBUGPODINFO="$(ps -elf | grep debug-node | /opt/debugpodinfo.awk -v "fssearch=/tmp/${TMPNAME}" 2>/dev/null)"
+  [ "${VERBOSE}" -eq "1" ] && printVerbose "Touched /tmp/${TMPNAME}"
 
-[ "${VERBOSE}" -eq "1" ] && printVerbose "debugpodinfo.awk output: ${DEBUGPODINFO}"
+  DEBUGPODINFO="$(ps -elf | grep debug-node | /opt/debugpodinfo.awk -v "fssearch=/tmp/${TMPNAME}" 2>/dev/null)"
 
-DEBUGPODNAME="$(echo "${DEBUGPODINFO}" | awk 'NR==1')"
-DEBUGPODNAMESPACE="$(echo "${DEBUGPODINFO}" | awk 'NR==2')"
+  [ "${VERBOSE}" -eq "1" ] && printVerbose "debugpodinfo.awk output: ${DEBUGPODINFO}"
 
-echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] Debug pod is ${DEBUGPODNAME} in namespace ${DEBUGPODNAMESPACE}"
+  DEBUGPODNAME="$(echo "${DEBUGPODINFO}" | awk 'NR==1')"
+  DEBUGPODNAMESPACE="$(echo "${DEBUGPODINFO}" | awk 'NR==2')"
 
-while true; do
-  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] Files are ready for download. Download with the following command in another window:"
-  echo ""
-  echo "  kubectl cp ${DEBUGPODNAME}:${TARFILE} $(basename "${TARFILE}") --namespace=${DEBUGPODNAMESPACE}"
-  echo ""
-  if read -p "After the download is complete, press ENTER to end this script and clean up: " -t ${DELAY} READSTR; then
-    break
-  fi
-  echo ""
-done
+  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] Debug pod is ${DEBUGPODNAME} in namespace ${DEBUGPODNAMESPACE}"
 
-echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] Processing finished. Deleting ${TARFILE}"
+  while true; do
+    echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] Files are ready for download. Download with the following command in another window:"
+    echo ""
+    echo "  kubectl cp ${DEBUGPODNAME}:${TARFILE} $(basename "${TARFILE}") --namespace=${DEBUGPODNAMESPACE}"
+    echo ""
+    if read -p "After the download is complete, press ENTER to end this script and clean up: " -t ${DELAY} READSTR; then
+      break
+    fi
+    echo ""
+  done
 
-rm -f "${TARFILE}"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] Processing finished. Deleting ${TARFILE}"
+
+  rm -f "${TARFILE}"
+fi
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] run.sh finished."
