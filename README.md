@@ -16,7 +16,7 @@ Security note: using a worker node debug pod requires cluster administrator priv
 
 Execute the [WebSphere Performance, hang, or high CPU issues MustGather](https://www.ibm.com/support/pages/mustgather-performance-hang-or-high-cpu-issues-websphere-application-server-linux), execute [`server dump`](https://www.ibm.com/docs/en/was-liberty/core?topic=line-generating-liberty-server-dump-from-command), gather Liberty logs, configuration, the MustGather output, javacores, and any server dumps, and finally delete the javacores and any server dumps.
 
-Replace `$NODE` with the node name and `$PODS` with the pod name(s):
+Replace `$NODE` with the node name and `$PODS` with the pod names (space-delimited):
 
 ```
 oc debug node/$NODE -t --image=quay.io/ibm/containerdiag -- libertyperf.sh $PODS
