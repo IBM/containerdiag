@@ -212,6 +212,9 @@ if [ "${NODOWNLOAD}" -eq "0" ]; then
     echo ""
     echo "  kubectl cp ${DEBUGPODNAME}:${TARFILE} $(basename "${TARFILE}") --namespace=${DEBUGPODNAMESPACE}"
     echo ""
+    # We don't just allow a lone ENTER because admins often press ENTER during script execution
+    # to visually space output, and those get queued up the input buffer and would end up
+    # immediately returning here before the admin had a chance to download the file.
     if read -p "After the download is complete, Ctrl^C or type OK and press ENTER to end this script and clean up: " -t ${DELAY} READSTR; then
       if [ "${READSTR}" = "OK" ] || [ "${READSTR}" = "ok" ]; then
         break
