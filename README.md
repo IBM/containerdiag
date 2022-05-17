@@ -14,12 +14,20 @@ Security note: using a worker node debug pod requires cluster administrator priv
 
 ### WebSphere Liberty performance, hang, or high CPU issues
 
-Execute [`linperf.sh`](https://www.ibm.com/support/pages/mustgather-performance-hang-or-high-cpu-issues-websphere-application-server-linux), gather Liberty logs and javacores, and delete the javacores.
+Execute the [WebSphere Performance, hang, or high CPU issues MustGather](https://www.ibm.com/support/pages/mustgather-performance-hang-or-high-cpu-issues-websphere-application-server-linux), execute [`server dump`](https://www.ibm.com/docs/en/was-liberty/core?topic=line-generating-liberty-server-dump-from-command), gather Liberty logs, configuration, the MustGather output, javacores, and any server dumps, and finally delete the javacores and any server dumps.
 
-Replace `$NODE` with the node name and `$POD` with the pod name:
+Replace `$NODE` with the node name and `$PODS` with the pod name(s):
 
 ```
-oc debug node/$NODE -t --image=quay.io/ibm/containerdiag -- libertyperf.sh $POD
+oc debug node/$NODE -t --image=quay.io/ibm/containerdiag -- libertyperf.sh $PODS
+```
+
+### tcpdump
+
+Execute [`tcpdump`](https://www.kernel.org/doc/man-pages/online/pages/man1/tcpdump.1.html) for a specified DURATION (in seconds) on the `any` interface:
+
+```
+oc debug node/$NODE -t --image=quay.io/ibm/containerdiag -- tcpdump.sh -d DURATION
 ```
 
 ## Support
