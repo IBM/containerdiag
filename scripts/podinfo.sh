@@ -107,11 +107,11 @@ for ID in $(echo "${RUNCLIST}" | awk 'NF > 3 && $3 != "stopped" && $3 != "STATUS
         printf " "
       fi
       if [ "${OUTPUTTYPE}" -eq "0" ]; then
-        printf "${PID}"
+        printf "%s" "${PID}"
       elif [ "${OUTPUTTYPE}" -eq "1" ]; then
-        printf "${ROOTFS}"
+        printf "%s" "${ROOTFS}"
       elif [ "${OUTPUTTYPE}" -eq "2" ]; then
-        printf "${STDOUTERR}"
+        printf "%s" "${STDOUTERR}"
       fi
       FOUND="$(((${FOUND}+1)))"
     fi

@@ -37,4 +37,4 @@ for ARG in "${@}"; do
   PODARGS="${PODARGS} -p ${ARG}"
 done
 
-run.sh sh -c "linperf.sh -q -s ${SCRIPTSPAN} $(podinfo.sh -p "${@}") && podfscp.sh -s ${PODARGS} /logs /config /output/javacore* && podfsrm.sh ${PODARGS} /output/javacore*"
+run.sh sh -c "linperf.sh -q -s ${SCRIPTSPAN} $(podinfo.sh -p "${@}") && DUMPS="$(libertydump.sh ${PODARGS})"; podfscp.sh -s ${PODARGS} /logs /config /output/javacore* \${DUMPS} ; podfsrm.sh ${PODARGS} /output/javacore* \${DUMPS}"

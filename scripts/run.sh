@@ -149,9 +149,10 @@ if [ -d /proc/${BGPID} ]; then
   done
 fi
 
-printInfo "containerdiag: command completed. Gathering second set of system info."
+printInfo "containerdiag: command completed."
 
 if [ "${SKIPSTATS}" -eq "0" ]; then
+  printInfo "containerdiag: Gathering second set of system info."
   nodeInfo "stats_iteration2_$(date +"%Y%m%d_%H%M%S")"
 fi
 
