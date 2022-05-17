@@ -218,6 +218,8 @@ if [ "${NODOWNLOAD}" -eq "0" ]; then
     if read -p "After the download is complete, Ctrl^C or type OK and press ENTER to end this script and clean up: " -t ${DELAY} READSTR; then
       if [ "${READSTR}" = "OK" ] || [ "${READSTR}" = "ok" ]; then
         break
+      else
+        echo "ENTER encountered without OK confirmation; continue waiting..."
       fi
     fi
     echo ""
