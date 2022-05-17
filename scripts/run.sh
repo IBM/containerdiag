@@ -74,11 +74,11 @@ if [ ! -d "${DESTDIR}" ]; then
 fi
 
 printVerbose() {
-  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] ${@}" >> /dev/stderr
+  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): ${@}" >> /dev/stderr
 }
 
 printInfo() {
-  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] ${@}" | tee -a "${OUTPUTFILE}"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): ${@}" | tee -a "${OUTPUTFILE}"
 }
 
 if [ "${#}" -eq 0 ]; then
@@ -102,7 +102,7 @@ echo "Writing to ${TARGETDIR}"
 pushd "${TARGETDIR}" || exit 4
 
 # Now we can finally start the execution
-printInfo "containerdiag: started on $(hostname). Gathering first set of system info."
+printInfo "started on $(hostname). Gathering first set of system info."
 
 nodeInfo() {
   mkdir -p node/$1
@@ -134,14 +134,14 @@ fi
 
 BGPID="${!}"
 
-printInfo "containerdiag: waiting for background commands (PID ${BGPID}) to finish..."
+printInfo "waiting for background commands (PID ${BGPID}) to finish..."
 
 # Some scripts finish in a few seconds, so optimize for that case
 sleep 5
 
 if [ -d /proc/${BGPID} ]; then
   while true; do
-    echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] containerdiag: Waiting for script to complete"
+    printInfo "Waiting for script to complete"
     sleep ${DELAY}
     if [ ! -d /proc/${BGPID} ]; then
       break
@@ -149,10 +149,10 @@ if [ -d /proc/${BGPID} ]; then
   done
 fi
 
-printInfo "containerdiag: command completed."
+printInfo "command completed."
 
 if [ "${SKIPSTATS}" -eq "0" ]; then
-  printInfo "containerdiag: Gathering second set of system info."
+  printInfo "Gathering second set of system info."
   nodeInfo "stats_iteration2_$(date +"%Y%m%d_%H%M%S")"
 fi
 
@@ -176,10 +176,10 @@ chroot /host df -h &> node/info/df.txt
 chroot /host systemctl list-units &> node/info/systemctlunits.txt
 chroot /host systemd-cgls &> node/info/cgroups.txt
 
-printInfo "containerdiag: All data gathering complete."
+printInfo "All data gathering complete."
 
 if [ "${NODOWNLOAD}" -eq "0" ]; then
-  printInfo "containerdiag: Packaging for download."
+  printInfo "Packaging for download."
 
   # After we're done, we want to package everything up into a tgz
   # and show an example command of how to download it.
@@ -189,7 +189,7 @@ if [ "${NODOWNLOAD}" -eq "0" ]; then
   rm -rf "${TARGETDIR}"
 
   # Stop using printInfo since we're packaging that output
-  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] Finished with output in ${TARFILE}"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): Finished with output in ${TARFILE}"
 
   # Now we need to figure out our own pod name and namespace to create the
   # right download command. We touch a file in our temp directory which we'll
@@ -205,10 +205,10 @@ if [ "${NODOWNLOAD}" -eq "0" ]; then
   DEBUGPODNAME="$(echo "${DEBUGPODINFO}" | awk 'NR==1')"
   DEBUGPODNAMESPACE="$(echo "${DEBUGPODINFO}" | awk 'NR==2')"
 
-  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] Debug pod is ${DEBUGPODNAME} in namespace ${DEBUGPODNAMESPACE}"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): Debug pod is ${DEBUGPODNAME} in namespace ${DEBUGPODNAMESPACE}"
 
   while true; do
-    echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] Files are ready for download. Download with the following command in another window:"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): Files are ready for download. Download with the following command in another window:"
     echo ""
     echo "  kubectl cp ${DEBUGPODNAME}:${TARFILE} $(basename "${TARFILE}") --namespace=${DEBUGPODNAMESPACE}"
     echo ""
@@ -218,9 +218,9 @@ if [ "${NODOWNLOAD}" -eq "0" ]; then
     echo ""
   done
 
-  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] Processing finished. Deleting ${TARFILE}"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): Processing finished. Deleting ${TARFILE}"
 
   rm -f "${TARFILE}"
 fi
 
-echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] run.sh finished."
+echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): finished."

@@ -25,7 +25,7 @@ EOF
 }
 
 printVerbose() {
-  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] ${@}" >> /dev/stderr
+  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): ${@}" >> /dev/stderr
 }
 
 PODNAMES=""
@@ -58,6 +58,8 @@ if [ "${PODNAMES}" = "" ]; then
 fi
 
 FOUND=0
+
+[ "${VERBOSE}" -eq "1" ] && printVerbose "started with ${PODNAMES}"
 
 processPod() {
   PODNAME="${1}"
@@ -101,6 +103,7 @@ processPod() {
         OUTPUT="$(nsenter -a --follow-context --setuid $(stat -c "%u" /proc/${PODPID}/) --target ${PODPID} "${PODEXE}" -jar "${LIBERTYROOT}/bin/tools/ws-server.jar" "${LIBERTYSERVER}" --dump)"
         [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod server dump output: ${OUTPUT}"
         DUMP="$(echo ${OUTPUT} | awk '/dump complete in/ { gsub(/\.$/, "", $NF); print $NF; }')"
+        [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod DUMP=${DUMP}"
         if [ "${DUMP}" != "" ]; then
           FOUND="$(((${FOUND}+1)))"
           if [ "${FOUND}" -gt 0 ]; then
@@ -122,3 +125,5 @@ done
 if [ "${FOUND}" -gt 0 ]; then
   printf "\n"
 fi
+
+[ "${VERBOSE}" -eq "1" ] && printVerbose "finished"

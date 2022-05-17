@@ -27,7 +27,7 @@ EOF
 }
 
 printVerbose() {
-  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] ${@}" >> /dev/stderr
+  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): ${@}" >> /dev/stderr
 }
 
 RUNC="chroot /host runc"
@@ -73,7 +73,7 @@ if [ "${#}" -eq 0 ]; then
   usage
 fi
 
-[ "${VERBOSE}" -eq "1" ] && printVerbose "Started"
+[ "${VERBOSE}" -eq "1" ] && printVerbose "started with ${@}"
 
 [ "${VERBOSE}" -eq "1" ] && printVerbose "${RUNC} list"
 
@@ -122,4 +122,4 @@ if [ "${FOUND}" -gt 0 ]; then
   printf "\n"
 fi
 
-[ "${VERBOSE}" -eq "1" ] && printVerbose "Finished"
+[ "${VERBOSE}" -eq "1" ] && printVerbose "finished"

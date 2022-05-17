@@ -25,7 +25,7 @@ EOF
 }
 
 printVerbose() {
-  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] ${@}" >> /dev/stderr
+  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): ${@}" >> /dev/stderr
 }
 
 PODNAMES=""
@@ -62,6 +62,8 @@ if [ "${#}" -eq 0 ]; then
   usage
 fi
 
+[ "${VERBOSE}" -eq "1" ] && printVerbose "started with ${@}"
+
 processPod() {
   PODNAME="${1}"
   [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod ${PODNAME} with ${@}"
@@ -88,3 +90,5 @@ processPod() {
 for PODNAME in ${PODNAMES}; do
   processPod "${PODNAME}" "${@}"
 done
+
+[ "${VERBOSE}" -eq "1" ] && printVerbose "finished"
