@@ -212,8 +212,10 @@ if [ "${NODOWNLOAD}" -eq "0" ]; then
     echo ""
     echo "  kubectl cp ${DEBUGPODNAME}:${TARFILE} $(basename "${TARFILE}") --namespace=${DEBUGPODNAMESPACE}"
     echo ""
-    if read -p "After the download is complete, press ENTER to end this script and clean up: " -t ${DELAY} READSTR; then
-      break
+    if read -p "After the download is complete, Ctrl^C or type OK and press ENTER to end this script and clean up: " -t ${DELAY} READSTR; then
+      if [ "${READSTR}" = "OK" ] || [ "${READSTR}" = "ok" ]; then
+        break
+      fi
     fi
     echo ""
   done
