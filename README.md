@@ -1,6 +1,6 @@
 # containerdiag
 
-This container image, available at [quay.io/ibm/containerdiag](https://quay.io/repository/ibm/containerdiag?tab=tags), helps perform diagnostics on running containers using [worker node debug pods](https://kubernetes.io/docs/tasks/debug/debug-application/debug-running-pod/#node-shell-session). This requires cluster administrator privileges and runs the debug pod as `root`.
+This container image, available at [quay.io/ibm/containerdiag](https://quay.io/repository/ibm/containerdiag?tab=tags), helps perform diagnostics on running containers using [worker node debug pods](https://kubernetes.io/docs/tasks/debug/debug-application/debug-running-pod/#node-shell-session). This requires cluster administrator privileges.
 
 The main issue today in remoting into running containers and debugging them is that you are limited to the diagnostic tools baked into the container image (until [ephemeral debug containers](https://kubernetes.io/docs/tasks/debug/debug-application/debug-running-pod/#ephemeral-container) become more widely available). A general best practice is to build images with minimal utilities, so administrators are often lacking even basic tools like `top -H` to investigate per-thread CPU utilization.
 
