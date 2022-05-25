@@ -98,6 +98,7 @@ RUN get_git() { \
     ln -s /opt/problemdetermination/scripts/was/twas_pmi_threadpool.awk /usr/local/bin/ && \
     chmod a+x /opt/debugpodinfo.awk && ln -s /opt/debugpodinfo.awk /usr/local/bin/ && \
     chmod a+x /opt/guesslink.sh && ln -s /opt/guesslink.sh /usr/local/bin/ && \
+    chmod a+x /opt/javaperf.sh && ln -s /opt/javaperf.sh /usr/local/bin/ && \
     chmod a+x /opt/libertydump.sh && ln -s /opt/libertydump.sh /usr/local/bin/ && \
     chmod a+x /opt/libertyperf.sh && ln -s /opt/libertyperf.sh /usr/local/bin/ && \
     chmod a+x /opt/linperf.sh && ln -s /opt/linperf.sh /usr/local/bin/ && \
