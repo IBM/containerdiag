@@ -24,10 +24,10 @@ oc debug node/$NODE -t --image=quay.io/ibm/containerdiag -- libertyperf.sh $PODS
 
 ### tcpdump
 
-Execute [`tcpdump`](https://www.kernel.org/doc/man-pages/online/pages/man1/tcpdump.1.html) for a specified DURATION (in seconds) on the `any` interface:
+Execute [`tcpdump`](https://www.kernel.org/doc/man-pages/online/pages/man1/tcpdump.1.html) for a specified duration. Replace `$DURATION` with a time in seconds:
 
 ```
-oc debug node/$NODE -t --image=quay.io/ibm/containerdiag -- tcpdump.sh -0 DURATION
+oc debug node/$NODE -t --image=quay.io/ibm/containerdiag -- tcpdump.sh -0 $DURATION
 ```
 
 ## Support

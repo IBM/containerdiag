@@ -14,20 +14,22 @@
 #  * limitations under the License.
 #  *******************************************************************************/
 # Building:
+#   podman login quay.io
 #   podman build -t containerdiag .
 #   podman tag $(podman images | grep "localhost/containerdiag[ \t]" | awk '{print $3}') quay.io/ibm/containerdiag
-#   podman login quay.io
 #   podman push quay.io/ibm/containerdiag
+#   Check at https://quay.io/repository/ibm/containerdiag?tab=tags
 #
 # Notes:
-#   * As of writing this note, this image is about 440MB
+#   * As of writing this note, this image is about 840MB
 #   * Base fedora:latest is about 175MB
 #   * Tried ubi-minimal which is about 100MB but microdnf is missing many useful packages like fatrace and others 
 #   * gdb adds about 68MB but considered worth it for gdb and gcore
 #   * runc adds about 14MB but considered worth it for use with oc debug on a node
 #   * git adds about 41MB so instead we just use wget https://github.com/$GROUP/$REPO/archive/master.zip
 #   * perf adds about 40MB but considered worth it since it's commonly needed
-#   * Therefore, the rest of the utilities are about 100MB
+#   * The rest of the utilities are about 100MB
+#   * Then there is also a Java 11 JDK which is another few hundred MB
 #   * Deleting files in the parent (e.g. /usr/lib64/python*/__pycache__) isn't useful because it's still in that layer
 
 FROM fedora
@@ -90,6 +92,7 @@ RUN get_git() { \
     ln -s /opt/kgibm_problemdetermination/scripts/ihs/ihs_mpmstats.awk /usr/local/bin/ && \
     ln -s /opt/kgibm_problemdetermination/scripts/was/twas_pmi_threadpool.awk /usr/local/bin/ && \
     chmod a+x /opt/debugpodinfo.awk && ln -s /opt/debugpodinfo.awk /usr/local/bin/ && \
+    chmod a+x /opt/guesslink.sh && ln -s /opt/guesslink.sh /usr/local/bin/ && \
     chmod a+x /opt/libertydump.sh && ln -s /opt/libertydump.sh /usr/local/bin/ && \
     chmod a+x /opt/libertyperf.sh && ln -s /opt/libertyperf.sh /usr/local/bin/ && \
     chmod a+x /opt/linperf.sh && ln -s /opt/linperf.sh /usr/local/bin/ && \
