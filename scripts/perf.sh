@@ -32,4 +32,4 @@ if [ "${1:-}" = "--" ]; then
   shift
 fi
 
-run.sh sh -c "perf record -o perf.data --call-graph dwarf,65528 -F 99 -a -g -- sleep ${DURATION} && perf script > diag_perfscript_\$(hostname)_\$(date +%Y%m%d_%H%M%S_%N).txt && perf archive"
+run.sh sh -c "perf record -o perf.data --call-graph dwarf,65528 -F 99 -a -g -- sleep ${DURATION} &>>stdouterr.log && perf script --kallsyms=/host/proc/kallsyms --symfs=/host/ > diag_perfscript_\$(hostname)_\$(date +%Y%m%d_%H%M%S_%N).txt 2>>stdouterr.log && cat diag_perfscript_*.txt | stackcollapse-perf.pl | flamegraph.pl --width 1024 > perf.svg && perf archive &>>stdouterr.log"

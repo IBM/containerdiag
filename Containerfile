@@ -21,13 +21,14 @@
 #   Check at https://quay.io/repository/ibm/containerdiag?tab=tags
 #
 # Notes:
-#   * As of writing this note, this image is about 840MB
+#   * As of writing this note, this image is about 1GB
 #   * Base fedora:latest is about 175MB
 #   * Tried ubi-minimal which is about 100MB but microdnf is missing many useful packages like fatrace and others 
 #   * gdb adds about 68MB but considered worth it for gdb and gcore
 #   * runc adds about 14MB but considered worth it for use with oc debug on a node
 #   * git adds about 41MB so instead we just use wget https://github.com/$GROUP/$REPO/archive/master.zip
 #   * perf adds about 40MB but considered worth it since it's commonly needed
+#   * perfl adds about 150MB but is needed for FlameGraph
 #   * The rest of the utilities are about 100MB
 #   * Then there is also a Java 11 JDK which is another few hundred MB
 #   * Deleting files in the parent (e.g. /usr/lib64/python*/__pycache__) isn't useful because it's still in that layer
@@ -53,6 +54,7 @@ RUN dnf install -y \
         nmon \
         p7zip \
         perf \
+        perl \
         procps-ng \
         psmisc \
         runc \
@@ -84,18 +86,22 @@ COPY scripts/*.sh scripts/*.awk /opt/
 RUN get_git() { \
       wget -q -O /tmp/$1_$2_master.zip https://github.com/$1/$2/archive/master.zip; \
       unzip -q /tmp/$1_$2_master.zip -d /opt/; \
-      mv /opt/$2-master /opt/$1_$2/; \
+      mv /opt/$2-master /opt/$2/; \
       rm /tmp/$1_$2_master.zip; \
     } && \
+    get_git brendangregg FlameGraph && \
+    ln -s /opt/FlameGraph/stackcollapse-perf.pl /usr/local/bin/ && \
+    ln -s /opt/FlameGraph/flamegraph.pl /usr/local/bin/ && \
     get_git kgibm problemdetermination && \
-    ln -s /opt/kgibm_problemdetermination/scripts/java/j9/j9javacores.awk /usr/local/bin/ && \
-    ln -s /opt/kgibm_problemdetermination/scripts/ihs/ihs_mpmstats.awk /usr/local/bin/ && \
-    ln -s /opt/kgibm_problemdetermination/scripts/was/twas_pmi_threadpool.awk /usr/local/bin/ && \
+    ln -s /opt/problemdetermination/scripts/java/j9/j9javacores.awk /usr/local/bin/ && \
+    ln -s /opt/problemdetermination/scripts/ihs/ihs_mpmstats.awk /usr/local/bin/ && \
+    ln -s /opt/problemdetermination/scripts/was/twas_pmi_threadpool.awk /usr/local/bin/ && \
     chmod a+x /opt/debugpodinfo.awk && ln -s /opt/debugpodinfo.awk /usr/local/bin/ && \
     chmod a+x /opt/guesslink.sh && ln -s /opt/guesslink.sh /usr/local/bin/ && \
     chmod a+x /opt/libertydump.sh && ln -s /opt/libertydump.sh /usr/local/bin/ && \
     chmod a+x /opt/libertyperf.sh && ln -s /opt/libertyperf.sh /usr/local/bin/ && \
     chmod a+x /opt/linperf.sh && ln -s /opt/linperf.sh /usr/local/bin/ && \
+    chmod a+x /opt/perf.sh && ln -s /opt/perf.sh /usr/local/bin/ && \
     chmod a+x /opt/podfscp.sh && ln -s /opt/podfscp.sh /usr/local/bin/ && \
     chmod a+x /opt/podfspath.sh && ln -s /opt/podfspath.sh /usr/local/bin/ && \
     chmod a+x /opt/podfsrm.sh && ln -s /opt/podfsrm.sh /usr/local/bin/ && \
