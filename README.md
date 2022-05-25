@@ -40,7 +40,7 @@ oc debug node/$NODE -t --image=quay.io/ibm/containerdiag -- tcpdump.sh -0 $DURAT
 
 ### perf
 
-Execute [`tcpdump`](https://www.kernel.org/doc/man-pages/online/pages/man1/perf.1.html) for a specified duration. Replace `$DURATION` with a time in seconds:
+Execute [`perf`](https://www.kernel.org/doc/man-pages/online/pages/man1/perf.1.html) for a specified duration. Replace `$DURATION` with a time in seconds:
 
 ```
 oc debug node/$NODE -t --image=quay.io/ibm/containerdiag -- perf.sh -d $DURATION
