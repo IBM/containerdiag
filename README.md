@@ -30,6 +30,14 @@ Execute [`tcpdump`](https://www.kernel.org/doc/man-pages/online/pages/man1/tcpdu
 oc debug node/$NODE -t --image=quay.io/ibm/containerdiag -- tcpdump.sh -0 $DURATION
 ```
 
+### perf
+
+Execute [`tcpdump`](https://www.kernel.org/doc/man-pages/online/pages/man1/perf.1.html) for a specified duration. Replace `$DURATION` with a time in seconds:
+
+```
+oc debug node/$NODE -t --image=quay.io/ibm/containerdiag -- perf.sh -d $DURATION
+```
+
 ## Support
 
 This image is provided as is without any warranty or support but we will do our best to respond to issues as time permits.
