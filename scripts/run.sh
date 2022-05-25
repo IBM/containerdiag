@@ -207,6 +207,8 @@ if [ "${NODOWNLOAD}" -eq "0" ]; then
 
   echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): Debug pod is ${DEBUGPODNAME} in namespace ${DEBUGPODNAMESPACE}"
 
+  ls -lh "${TARFILE}"
+
   while true; do
     echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): Files are ready for download. Download with the following command in another window:"
     echo ""

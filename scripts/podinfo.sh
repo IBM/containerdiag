@@ -16,8 +16,9 @@
 #  *******************************************************************************/
 
 usage() {
-  printf "Usage: %s [-oprv] PODNAME...\n" "$(basename "${0}")"
+  printf "Usage: %s [-joprv] PODNAME...\n" "$(basename "${0}")"
   cat <<"EOF"
+             -j: Find Java child PIDs.
              -o: Print space-delimited list of stdout/stderr file paths matching PODNAME(s)
              -p: Default. Print space-delimited list of PIDs matching PODNAME(s)
              -r: Print space-delimited list of root filesystem paths matching PODNAME(s)
@@ -34,15 +35,19 @@ RUNC="chroot /host runc"
 DEBUG=0
 VERBOSE=0
 OUTPUTTYPE=0
+FINDJAVA=0
 
 OPTIND=1
-while getopts "dhnoprv?" opt; do
+while getopts "dhjnoprv?" opt; do
   case "$opt" in
     d)
       DEBUG=1
       ;;
     h|\?)
       usage
+      ;;
+    j)
+      FINDJAVA=1
       ;;
     n)
       RUNC="runc"
@@ -107,7 +112,11 @@ for ID in $(echo "${RUNCLIST}" | awk 'NF > 3 && $3 != "stopped" && $3 != "STATUS
         printf " "
       fi
       if [ "${OUTPUTTYPE}" -eq "0" ]; then
-        printf "%s" "${PID}"
+        if [ "${FINDJAVA}" -eq "0" ]; then
+          printf "%s" "${PID}"
+        else
+          printf "%s" "$(pstree -pT ${PID} | awk '/java/ && !/logViewer/ {gsub(/[()]/, " "); print $NF;}' | tr '\n' ' ')"
+        fi
       elif [ "${OUTPUTTYPE}" -eq "1" ]; then
         printf "%s" "${ROOTFS}"
       elif [ "${OUTPUTTYPE}" -eq "2" ]; then
