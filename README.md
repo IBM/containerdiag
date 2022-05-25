@@ -22,6 +22,16 @@ Replace `$NODE` with the node name and `$PODS` with the pod names (space-delimit
 oc debug node/$NODE -t --image=quay.io/ibm/containerdiag -- libertyperf.sh $PODS
 ```
 
+### WebSphere Application Server traditional Base performance, hang, or high CPU issues
+
+Execute the [WebSphere Performance, hang, or high CPU issues MustGather](https://www.ibm.com/support/pages/mustgather-performance-hang-or-high-cpu-issues-websphere-application-server-linux), gather WAS traditional logs, configuration, the MustGather output, and javacores, and finally delete the javacores.
+
+Replace `$NODE` with the node name and `$PODS` with the pod names (space-delimited):
+
+```
+oc debug node/$NODE -t --image=quay.io/ibm/containerdiag -- twasperf.sh $PODS
+```
+
 ### tcpdump
 
 Execute [`tcpdump`](https://www.kernel.org/doc/man-pages/online/pages/man1/tcpdump.1.html) for a specified duration. Replace `$DURATION` with a time in seconds:

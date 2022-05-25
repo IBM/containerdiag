@@ -42,4 +42,4 @@ for ARG in "${@}"; do
   PODARGS="${PODARGS} -p ${ARG}"
 done
 
-run.sh sh -c "linperf.sh -q -s ${SCRIPTSPAN} $(podinfo.sh ${VERBOSE} -p ${@}) && podfscp.sh ${VERBOSE} -s ${PODARGS} /logs /config /output/javacore* ; podfsrm.sh ${VERBOSE} ${PODARGS} /output/javacore*"
+run.sh sh -c "linperf.sh -q -s ${SCRIPTSPAN} $(podinfo.sh ${VERBOSE} -p ${@}) && podfscp.sh ${VERBOSE} -s ${PODARGS} /opt/IBM/WebSphere/AppServer/profiles/*/logs/ /opt/IBM/WebSphere/AppServer/profiles/*/config/ /opt/IBM/WebSphere/AppServer/profiles/*/javacore* ; podfsrm.sh ${VERBOSE} ${PODARGS} /opt/IBM/WebSphere/AppServer/profiles/*/javacore*"
