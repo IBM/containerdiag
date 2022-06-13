@@ -221,7 +221,7 @@ if [ "${NODOWNLOAD}" -eq "0" ]; then
     # immediately returning here before the admin had a chance to download the file.
     #
     # Ctrl^C also works but might cause issues with poddiag for multi-node executions
-    if read -p "After the download is complete, type OK and press ENTER to end: " -t ${DELAY} READSTR; then
+    if read -p "After the download is complete, type OK and press ENTER: " -t ${DELAY} READSTR; then
       if [ "${READSTR}" = "OK" ] || [ "${READSTR}" = "ok" ] || [ "${READSTR}" = "O" ] || [ "${READSTR}" = "o" ]; then
         break
       else

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Comment about this script
+# Run specified COMMANDS using containerdiag on all pods in the specified DEPLOYMENT
 
 usage() {
   printf "Usage: %s [-k] [-v] [-n NAMESPACE] DEPLOYMENT COMMANDS...\n" "$(basename "${0}")"
@@ -55,7 +55,7 @@ if [ "${#}" -eq 0 ]; then
 fi
 
 printInfo() {
-  echo "[$(date '+%Y-%m-%d %H:%M:%S %Z')] $(basename "${0}"): ${@}"
+  echo "[$(date '+%Y-%m-%d %H:%M:%S %Z')] $(basename "${0}"): ${@}" | tee -a diag.log
 }
 
 printVerbose() {
