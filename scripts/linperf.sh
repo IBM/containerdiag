@@ -45,25 +45,35 @@ VMSTAT_INTERVAL=5        # How often vmstat data should be taken. Default=5
 KEEPQUIET=0
 ALLOWSTATS=0
 OPTIND=1
-while getopts "j:qs:t:u:v:z" opt; do
+while getopts "j:m:qs:t:u:z" opt; do
   case "$opt" in
     j)
-      JAVACORE_INTERVAL="${OPTARG}"
+		  if [ "${OPTARG}" != "-1" ]; then
+      	JAVACORE_INTERVAL="${OPTARG}"
+			fi
+      ;;
+    m)
+		  if [ "${OPTARG}" != "-1" ]; then
+        VMSTAT_INTERVAL="${OPTARG}"
+			fi
       ;;
     q)
       KEEPQUIET=1
       ;;
     s)
-      SCRIPT_SPAN="${OPTARG}"
+		  if [ "${OPTARG}" != "-1" ]; then
+        SCRIPT_SPAN="${OPTARG}"
+			fi
       ;;
     t)
-      TOP_INTERVAL="${OPTARG}"
+		  if [ "${OPTARG}" != "-1" ]; then
+        TOP_INTERVAL="${OPTARG}"
+			fi
       ;;
     u)
-      TOP_DASH_H_INTERVAL="${OPTARG}"
-      ;;
-    v)
-      VMSTAT_INTERVAL="${OPTARG}"
+		  if [ "${OPTARG}" != "-1" ]; then
+        TOP_DASH_H_INTERVAL="${OPTARG}"
+			fi
       ;;
     z)
       ALLOWSTATS=1
