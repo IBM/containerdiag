@@ -136,13 +136,20 @@ processPod() {
   POD="${1}"; shift
   WORKER="${1}"; shift
 
-  printInfo "Processing pod ${POD} on worker node ${WORKER} with ${@}"
+  printInfo "Processing pod ${POD} on worker node ${WORKER} with ${@} ${POD}"
 
   "${CTL}" debug "node/${WORKER}" -t --image=quay.io/ibm/containerdiag -- "${@}" "${POD}"
 }
 
-echo "${PODS}" | while read LINE; do
-  processPod $LINE "${@}"
+OLDIFS="${IFS}"
+
+# Subshell strips newline so add a random character to the end (+) and then strip it
+IFS="$(printf '\n/')"
+IFS="${IFS%/}"
+
+for LINE in ${PODS}; do
+  IFS="${OLDIFS}"
+  processPod ${LINE} "${@}"
 done
 
 printInfo "Finished"
