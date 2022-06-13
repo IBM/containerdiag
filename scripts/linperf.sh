@@ -48,32 +48,22 @@ OPTIND=1
 while getopts "j:m:qs:t:u:z" opt; do
   case "$opt" in
     j)
-		  if [ "${OPTARG}" != "-1" ]; then
-      	JAVACORE_INTERVAL="${OPTARG}"
-			fi
+      JAVACORE_INTERVAL="${OPTARG}"
       ;;
     m)
-		  if [ "${OPTARG}" != "-1" ]; then
-        VMSTAT_INTERVAL="${OPTARG}"
-			fi
+      VMSTAT_INTERVAL="${OPTARG}"
       ;;
     q)
       KEEPQUIET=1
       ;;
     s)
-		  if [ "${OPTARG}" != "-1" ]; then
-        SCRIPT_SPAN="${OPTARG}"
-			fi
+      SCRIPT_SPAN="${OPTARG}"
       ;;
     t)
-		  if [ "${OPTARG}" != "-1" ]; then
-        TOP_INTERVAL="${OPTARG}"
-			fi
+      TOP_INTERVAL="${OPTARG}"
       ;;
     u)
-		  if [ "${OPTARG}" != "-1" ]; then
-        TOP_DASH_H_INTERVAL="${OPTARG}"
-			fi
+      TOP_DASH_H_INTERVAL="${OPTARG}"
       ;;
     z)
       ALLOWSTATS=1

@@ -21,12 +21,12 @@
 # oc debug node/$NODE -t --image=quay.io/kgibm/containerdiagsmall -- run.sh sh -c 'echo "Hello World"'
 
 usage() {
-  printf "Usage: %s [-nsv] [-d DELAY] COMMAND [ARGUMENTS]\n" "$(basename "${0}")"
+  printf "Usage: %s [OPTIONS] COMMAND [ARGUMENTS]\n" "$(basename "${0}")"
   cat <<"EOF"
              -d: DELAY in seconds between checking command and download completion.
              -n: No download necessary
-             -q: Skip waiting for download
              -v: verbose output to stderr
+             -z: Skip statistics collection
 EOF
   exit 2
 }
@@ -39,10 +39,12 @@ NODOWNLOAD=0
 OUTPUTFILE="run_stdouterr.log"
 
 OPTIND=1
-while getopts "d:hnsv?" opt; do
+while getopts "d:hnvz?" opt; do
   case "$opt" in
     d)
-      DELAY="${OPTARG}"
+      if [ "${OPTARG}" != "-1" ]; then
+        DELAY="${OPTARG}"
+      fi
       ;;
     h|\?)
       usage
@@ -50,11 +52,11 @@ while getopts "d:hnsv?" opt; do
     n)
       NODOWNLOAD=1
       ;;
-    s)
-      SKIPSTATS=1
-      ;;
     v)
       VERBOSE=1
+      ;;
+    z)
+      SKIPSTATS=1
       ;;
   esac
 done
@@ -217,8 +219,10 @@ if [ "${NODOWNLOAD}" -eq "0" ]; then
     # We don't just allow a lone ENTER because admins often press ENTER during script execution
     # to visually space output, and those get queued up the input buffer and would end up
     # immediately returning here before the admin had a chance to download the file.
-    if read -p "After the download is complete, Ctrl^C or type OK and press ENTER to end this script and clean up: " -t ${DELAY} READSTR; then
-      if [ "${READSTR}" = "OK" ] || [ "${READSTR}" = "ok" ]; then
+    #
+    # Ctrl^C also works but might cause issues with poddiag for multi-node executions
+    if read -p "After the download is complete, type OK and press ENTER to end: " -t ${DELAY} READSTR; then
+      if [ "${READSTR}" = "OK" ] || [ "${READSTR}" = "ok" ] || [ "${READSTR}" = "O" ] || [ "${READSTR}" = "o" ]; then
         break
       else
         echo "ENTER encountered without OK confirmation; continue waiting..."
