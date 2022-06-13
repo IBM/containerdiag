@@ -2,32 +2,43 @@
 # Run specified COMMANDS using containerdiag on all pods in the specified DEPLOYMENT
 
 usage() {
-  printf "Usage: %s [-k] [-v] [-n NAMESPACE] DEPLOYMENT COMMANDS...\n" "$(basename "${0}")"
+  printf "Usage: %s [options] DEPLOYMENT COMMANDS...\n" "$(basename "${0}")"
   cat <<"EOF"
              -k: Use kubectl instead of oc
+             -i: IMAGE for the debug pod (default quay.io/ibm/containerdiag)
              -n: Namespace (optional; defaults to current namespace)
+             -q: Do not append the pod name to COMMANDS
              -v: verbose output to stderr
 
              COMMANDS will be passed to oc debug node along with the pod name at the end
+             (unless -q is specified in which case the pod name is not appended)
 EOF
   exit 22
 }
 
 NAMESPACE=""
 VERBOSE=0
+APPEND=1
 CTL="oc"
+IMAGE="quay.io/ibm/containerdiag"
 
 OPTIND=1
-while getopts "hkn:v?" opt; do
+while getopts "hi:kn:qv?" opt; do
   case "$opt" in
     h|\?)
       usage
+      ;;
+    i)
+      IMAGE="${OPTARG}"
       ;;
     k)
       CTL="kubectl"
       ;;
     n)
       NAMESPACE="${OPTARG}"
+      ;;
+    q)
+      APPEND=0
       ;;
     v)
       VERBOSE=1
@@ -136,14 +147,18 @@ processPod() {
   POD="${1}"; shift
   WORKER="${1}"; shift
 
-  printInfo "Processing pod ${POD} on worker node ${WORKER} with ${@} ${POD}"
-
-  "${CTL}" debug "node/${WORKER}" -t --image=quay.io/ibm/containerdiag -- "${@}" "${POD}" | tee -a diag.log
+  if [ "${APPEND}" -eq 1 ]; then
+    printInfo "Processing pod ${POD} on worker node ${WORKER} with ${@} ${POD}"
+    "${CTL}" debug "node/${WORKER}" -t --image=${IMAGE} -- "${@}" "${POD}" | tee -a diag.log
+  else
+    printInfo "Processing pod ${POD} on worker node ${WORKER} with ${@}"
+    "${CTL}" debug "node/${WORKER}" -t --image=${IMAGE} -- "${@}" | tee -a diag.log
+  fi
 }
 
 OLDIFS="${IFS}"
 
-# Subshell strips newline so add a random character to the end (+) and then strip it
+# Subshell strips newline so add a random character to the end (/) and then strip it
 IFS="$(printf '\n/')"
 IFS="${IFS%/}"
 
