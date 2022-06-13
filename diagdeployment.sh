@@ -59,7 +59,7 @@ printInfo() {
 }
 
 printVerbose() {
-  echo "[$(date '+%Y-%m-%d %H:%M:%S %Z')] $(basename "${0}"): ${@}" >> /dev/stderr
+  echo "[$(date '+%Y-%m-%d %H:%M:%S %Z')] $(basename "${0}"): ${@}" | tee -a diag.log
 }
 
 printInfo "Script started for deployment ${DEPLOYMENT}"
@@ -138,7 +138,7 @@ processPod() {
 
   printInfo "Processing pod ${POD} on worker node ${WORKER} with ${@} ${POD}"
 
-  "${CTL}" debug "node/${WORKER}" -t --image=quay.io/ibm/containerdiag -- "${@}" "${POD}"
+  "${CTL}" debug "node/${WORKER}" -t --image=quay.io/ibm/containerdiag -- "${@}" "${POD}" | tee -a diag.log
 }
 
 OLDIFS="${IFS}"
