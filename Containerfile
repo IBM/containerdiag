@@ -29,7 +29,6 @@
 #   * git adds about 41MB so instead we just use wget https://github.com/$GROUP/$REPO/archive/master.zip
 #   * perf adds about 40MB but considered worth it since it's commonly needed
 #   * perl adds about 150MB but is needed for FlameGraph
-#   * The rest of the utilities are about 100MB
 #   * Then there is also a Java 11 JDK which is another few hundred MB
 #   * Deleting files in the parent (e.g. /usr/lib64/python*/__pycache__) isn't useful because it's still in that layer
 
