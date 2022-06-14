@@ -93,7 +93,7 @@ processPod() {
       LIBERTYSERVER="$(cat /proc/${PODPID}/cmdline | tr '\0' ' ' | awk '{print $NF;}')"
       [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod LIBERTYSERVER=${LIBERTYSERVER}"
 
-      PODEXE="$(unshare -rR /host ls -l /proc/${PODPID} | awk '/ exe -/ { print $NF; }')"
+      PODEXE="$(ls -l /proc/${PODPID} | awk '/ exe -/ { print $NF; }')"
       [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod PODEXE=${PODEXE}"
 
       if [ "${PODEXE}" != "" ]; then
@@ -133,6 +133,9 @@ processPod() {
             [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod DUMP=${DUMP}"
 
             if [ "${DUMP}" != "" ]; then
+
+              printInfo "succeeded for ${PODNAME} with dump in ${DUMP}"
+
               FOUND="$(((${FOUND}+1)))"
               if [ "${FOUND}" -gt 0 ]; then
                 printf " "
