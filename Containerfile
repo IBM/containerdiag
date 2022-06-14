@@ -80,8 +80,6 @@ RUN mkdir -p /opt/java/11/ && \
     mv /opt/jdk* /opt/java/11/semeru && \
     ln -s /opt/java/11/semeru/bin/java /usr/local/bin/
 
-COPY scripts/*.sh scripts/*.awk /opt/
-
 RUN get_git() { \
       wget -q -O /tmp/$1_$2_master.zip https://github.com/$1/$2/archive/master.zip; \
       unzip -q /tmp/$1_$2_master.zip -d /opt/; \
@@ -94,19 +92,13 @@ RUN get_git() { \
     get_git kgibm problemdetermination && \
     ln -s /opt/problemdetermination/scripts/java/j9/j9javacores.awk /usr/local/bin/ && \
     ln -s /opt/problemdetermination/scripts/ihs/ihs_mpmstats.awk /usr/local/bin/ && \
-    ln -s /opt/problemdetermination/scripts/was/twas_pmi_threadpool.awk /usr/local/bin/ && \
-    chmod a+x /opt/debugpodinfo.awk && ln -s /opt/debugpodinfo.awk /usr/local/bin/ && \
-    chmod a+x /opt/guesslink.sh && ln -s /opt/guesslink.sh /usr/local/bin/ && \
-    chmod a+x /opt/libertydump.sh && ln -s /opt/libertydump.sh /usr/local/bin/ && \
-    chmod a+x /opt/libertyperf.sh && ln -s /opt/libertyperf.sh /usr/local/bin/ && \
-    chmod a+x /opt/linperf.sh && ln -s /opt/linperf.sh /usr/local/bin/ && \
-    chmod a+x /opt/perf.sh && ln -s /opt/perf.sh /usr/local/bin/ && \
-    chmod a+x /opt/podfscp.sh && ln -s /opt/podfscp.sh /usr/local/bin/ && \
-    chmod a+x /opt/podfspath.sh && ln -s /opt/podfspath.sh /usr/local/bin/ && \
-    chmod a+x /opt/podfsrm.sh && ln -s /opt/podfsrm.sh /usr/local/bin/ && \
-    chmod a+x /opt/podinfo.sh && ln -s /opt/podinfo.sh /usr/local/bin/ && \
-    chmod a+x /opt/run.sh && ln -s /opt/run.sh /usr/local/bin/ && \
-    chmod a+x /opt/tcpdump.sh && ln -s /opt/tcpdump.sh /usr/local/bin/ && \
-    chmod a+x /opt/twasperf.sh && ln -s /opt/twasperf.sh /usr/local/bin/
+    ln -s /opt/problemdetermination/scripts/was/twas_pmi_threadpool.awk /usr/local/bin/
+
+COPY scripts/*.sh scripts/*.awk /opt/
+
+RUN for SCRIPT in /opt/*.sh /opt/*.awk; do \
+      chmod a+x ${SCRIPT}; \
+      ln -s ${SCRIPT} /usr/local/bin/; \
+    done
 
 # Defer to the ENTRYPOINT/CMD of Fedora which is bash
