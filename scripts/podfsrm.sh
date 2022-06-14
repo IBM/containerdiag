@@ -28,6 +28,18 @@ printVerbose() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): ${@}" >> /dev/stderr
 }
 
+printInfo() {
+  echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): ${@}"
+}
+
+printError() {
+  printInfo "Error: " "${@}"
+}
+
+printWarning() {
+  printInfo "Warning: " "${@}"
+}
+
 PODNAMES=""
 VERBOSE=0
 
@@ -62,7 +74,7 @@ if [ "${#}" -eq 0 ]; then
   usage
 fi
 
-[ "${VERBOSE}" -eq "1" ] && printVerbose "started with ${@}"
+printInfo "started with ${@}"
 
 processPod() {
   PODNAME="${1}"
@@ -91,4 +103,4 @@ for PODNAME in ${PODNAMES}; do
   processPod "${PODNAME}" "${@}"
 done
 
-[ "${VERBOSE}" -eq "1" ] && printVerbose "finished"
+printInfo "finished"

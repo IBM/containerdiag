@@ -24,6 +24,7 @@ usage() {
   printf "Usage: %s [OPTIONS] COMMAND [ARGUMENTS]\n" "$(basename "${0}")"
   cat <<"EOF"
              -d: DELAY in seconds between checking command and download completion.
+             -k: Hint that kubernetes is the client instead of oc
              -n: No download necessary
              -v: verbose output to stderr
              -z: Skip statistics collection
@@ -37,9 +38,10 @@ SKIPSTATS=0
 DELAY=30
 NODOWNLOAD=0
 OUTPUTFILE="run_stdouterr.log"
+CLIENT="oc"
 
 OPTIND=1
-while getopts "d:hnvz?" opt; do
+while getopts "d:hknvz?" opt; do
   case "$opt" in
     d)
       if [ "${OPTARG}" != "-1" ]; then
@@ -48,6 +50,9 @@ while getopts "d:hnvz?" opt; do
       ;;
     h|\?)
       usage
+      ;;
+    k)
+      CLIENT="kubectl"
       ;;
     n)
       NODOWNLOAD=1
@@ -225,7 +230,7 @@ if [ "${NODOWNLOAD}" -eq "0" ]; then
   while true; do
     echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): Files are ready for download. Download with the following command in another window:"
     echo ""
-    echo "  kubectl cp ${DEBUGPODNAME}:${TARFILE} $(basename "${TARFILE}") --namespace=${DEBUGPODNAMESPACE}"
+    echo "  ${CLIENT} cp ${DEBUGPODNAME}:${TARFILE} $(basename "${TARFILE}") --namespace=${DEBUGPODNAMESPACE}"
     echo ""
     # We don't just allow a lone ENTER because admins often press ENTER during script execution
     # to visually space output, and those get queued up the input buffer and would end up

@@ -29,6 +29,24 @@ printVerbose() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): ${@}" >> /dev/stderr
 }
 
+printInfo() {
+  # We always print to stderr because the whole purpose of this script
+  # is to return something in stdout so we can't pollute that.
+  printVerbose "${@}"
+}
+
+printError() {
+  # We always print to stderr because the whole purpose of this script
+  # is to return something in stdout so we can't pollute that.
+  printVerbose "Error: " "${@}"
+}
+
+printWarning() {
+  # We always print to stderr because the whole purpose of this script
+  # is to return something in stdout so we can't pollute that.
+  printVerbose "Warning: " "${@}"
+}
+
 PODNAMES=""
 VERBOSE=0
 GETSTANDARD=0
@@ -67,7 +85,7 @@ if [ "${#}" -eq 0 ]; then
   usage
 fi
 
-[ "${VERBOSE}" -eq "1" ] && printVerbose "started with ${@}"
+printVerbose "started with ${@}"
 
 processPod() {
   PODNAME="${1}"
@@ -133,4 +151,4 @@ for PODNAME in ${PODNAMES}; do
   processPod "${PODNAME}" "${@}"
 done
 
-[ "${VERBOSE}" -eq "1" ] && printVerbose "finished"
+printVerbose "finished"

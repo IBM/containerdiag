@@ -31,6 +31,24 @@ printVerbose() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): ${@}" >> /dev/stderr
 }
 
+printInfo() {
+  # We always print to stderr because the whole purpose of this script
+  # is to return something in stdout so we can't pollute that.
+  printVerbose "${@}"
+}
+
+printError() {
+  # We always print to stderr because the whole purpose of this script
+  # is to return something in stdout so we can't pollute that.
+  printVerbose "Error: " "${@}"
+}
+
+printWarning() {
+  # We always print to stderr because the whole purpose of this script
+  # is to return something in stdout so we can't pollute that.
+  printVerbose "Warning: " "${@}"
+}
+
 # Note: use unshare instead of chroot because of https://github.com/opencontainers/runc/issues/3462#issuecomment-1155422205
 RUNC="unshare -rR /host runc"
 DEBUG=0
