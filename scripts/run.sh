@@ -18,7 +18,7 @@
 # for download. The idea of this script is that we run the specified commands
 # and then pause for download.
 # Example:
-# oc debug node/$NODE -t --image=quay.io/kgibm/containerdiagsmall -- run.sh sh -c 'echo "Hello World"'
+# oc debug node/$NODE -t --image=quay.io/ibm/containerdiagsmall -- run.sh sh -c 'echo "Hello World"'
 
 usage() {
   printf "Usage: %s [OPTIONS] COMMAND [ARGUMENTS]\n" "$(basename "${0}")"
