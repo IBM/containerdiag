@@ -6,6 +6,7 @@ usage() {
   cat <<"EOF"
              -d DEPLOYMENT: Run COMMANDS on all pods in the specified DEPLOYMENT
              -i IMAGE: The image used for the debug pod (default quay.io/ibm/containerdiag)
+             -k: By default, this script uses oc if available. This options forces the use of kubectl
              -n NAMESPACE: Namespace (optional; defaults to current namespace)
              -p POD: Run COMMANDS on the specified POD
              -q: Do not append the pod name to COMMANDS
@@ -26,8 +27,13 @@ IMAGE="quay.io/ibm/containerdiag"
 TARGETDEPLOYMENT=""
 TARGETPOD=""
 
+use_kubectl() {
+  CTL="kubectl"
+  CTL_DEBUG_FLAGS="-it"
+}
+
 OPTIND=1
-while getopts "d:hi:n:p:qv?" opt; do
+while getopts "d:hi:kn:p:qv?" opt; do
   case "$opt" in
     d)
       TARGETDEPLOYMENT="${OPTARG}"
@@ -37,6 +43,9 @@ while getopts "d:hi:n:p:qv?" opt; do
       ;;
     i)
       IMAGE="${OPTARG}"
+      ;;
+    k)
+      use_kubectl
       ;;
     n)
       NAMESPACE="${OPTARG}"
@@ -67,8 +76,7 @@ if ! command_exists oc && ! command_exists kubectl ; then
   echo "ERROR: Could not find the command oc or kubectl on PATH"
   exit 1
 elif ! command_exists oc ; then
-  CTL="kubectl"
-  CTL_DEBUG_FLAGS="-it"
+  use_kubectl
 fi
 
 if [ "${TARGETDEPLOYMENT}" = "" ] && [ "${TARGETPOD}" = "" ]; then
