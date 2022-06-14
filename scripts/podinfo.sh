@@ -31,7 +31,8 @@ printVerbose() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): ${@}" >> /dev/stderr
 }
 
-RUNC="chroot /host runc"
+# Note: use unshare instead of chroot because of https://github.com/opencontainers/runc/issues/3462#issuecomment-1155422205
+RUNC="unshare -rR /host runc"
 DEBUG=0
 VERBOSE=0
 OUTPUTTYPE=0

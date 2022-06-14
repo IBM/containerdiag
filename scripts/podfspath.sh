@@ -20,7 +20,8 @@
 # a chroot, and we can't chroot, because then we can't do anything with the files like
 # copy them out. In addition, dirname doesn't work if there isn't an actual filename,
 # so check if it's a dir.
-REALPATH="$(chroot "/host/${1}/" sh -c "if [ -d \"${2}\" ]; then cd \"${2}\"; else cd \$(dirname \"${2}\"); fi && pwd -P")"
+# Note: use unshare instead of chroot because of https://github.com/opencontainers/runc/issues/3462#issuecomment-1155422205
+REALPATH="$(unshare -rR "/host/${1}/" sh -c "if [ -d \"${2}\" ]; then cd \"${2}\"; else cd \$(dirname \"${2}\"); fi && pwd -P")"
 if [ "${REALPATH}" != "" ]; then
   # First condition: Same as when getting the REALPATH above
   # Second condition: Outside the chroot, -d won't be able to resolve directory symlinks, so check explicitly

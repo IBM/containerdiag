@@ -106,6 +106,8 @@ pushd "${TARGETDIR}" || exit 4
 # Now we can finally start the execution
 printInfo "started on $(hostname)"
 
+# Note: use unshare instead of chroot because of https://github.com/opencontainers/runc/issues/3462#issuecomment-1155422205
+
 nodeInfo() {
   mkdir -p node/$1
   top -b -d 1 -n 2 &> node/$1/top.txt
@@ -120,7 +122,7 @@ nodeInfo() {
   netstat -i &> node/$1/netstati.txt
   netstat -s &> node/$1/netstats.txt
   netstat -anop &> node/$1/netstat.txt
-  chroot /host systemd-cgtop -b --depth=5 -d 1 -n 2 &> node/$1/cgtop.txt
+  unshare -rR /host systemd-cgtop -b --depth=5 -d 1 -n 2 &> node/$1/cgtop.txt
   cat /proc/loadavg &> node/$1/loadavg.txt
 }
 
@@ -163,13 +165,13 @@ if [ "${SKIPSTATS}" -eq "0" ]; then
 fi
 
 mkdir -p node/info
-chroot /host date &> node/info/date.txt
-chroot /host uname -a &> node/info/uname.txt
-chroot /host journalctl -b | head -2000 &> node/info/journalctl_head.txt
-chroot /host journalctl -b -n 2000 &> node/info/journalctl_tail.txt
-chroot /host journalctl -p warning -n 500 &> node/info/journalctl_errwarn.txt
-chroot /host sysctl -a &> node/info/sysctl.txt
-chroot /host lscpu &> node/info/lscpu.txt
+unshare -rR /host date &> node/info/date.txt
+unshare -rR /host uname -a &> node/info/uname.txt
+unshare -rR /host journalctl -b | head -2000 &> node/info/journalctl_head.txt
+unshare -rR /host journalctl -b -n 2000 &> node/info/journalctl_tail.txt
+unshare -rR /host journalctl -p warning -n 500 &> node/info/journalctl_errwarn.txt
+unshare -rR /host sysctl -a &> node/info/sysctl.txt
+unshare -rR /host lscpu &> node/info/lscpu.txt
 ulimit -a &> node/info/ulimit.txt
 uptime &> node/info/uptime.txt
 hostname &> node/info/hostname.txt
@@ -178,9 +180,9 @@ cat /host/proc/meminfo &> node/info/meminfo.txt
 cat /host/proc/version &> node/info/version.txt
 cp -r /host/proc/pressure node/info/ 2>/dev/null
 cat /host/etc/*elease* &> node/info/release.txt
-chroot /host df -h &> node/info/df.txt
-chroot /host systemctl list-units &> node/info/systemctlunits.txt
-chroot /host systemd-cgls &> node/info/cgroups.txt
+unshare -rR /host df -h &> node/info/df.txt
+unshare -rR /host systemctl list-units &> node/info/systemctlunits.txt
+unshare -rR /host systemd-cgls &> node/info/cgroups.txt
 
 printInfo "All data gathering complete."
 
@@ -204,7 +206,12 @@ if [ "${NODOWNLOAD}" -eq "0" ]; then
 
   [ "${VERBOSE}" -eq "1" ] && printVerbose "Touched /tmp/${TMPNAME}"
 
-  DEBUGPODINFO="$(ps -elf | grep debug-node | /opt/debugpodinfo.awk -v "fssearch=/tmp/${TMPNAME}" 2>/dev/null)"
+  # Find all processes that have certain phrases in them (like debug-node and debugger)
+  # We don't have to be super accurate here and false positives are okay because
+  # then we'll walk through all of these (using the awk script) and search for the file we just touched.
+  # So the goal is not to find the right process right off the bat, but to avoid
+  # Looking through all containers by running runc list and then walking that list
+  DEBUGPODINFO="$(ps -elf | grep -e debug-node -e debugger | /opt/debugpodinfo.awk -v "fssearch=/tmp/${TMPNAME}" 2>/dev/null)"
 
   [ "${VERBOSE}" -eq "1" ] && printVerbose "debugpodinfo.awk output: ${DEBUGPODINFO}"
 
