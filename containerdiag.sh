@@ -66,7 +66,7 @@ command_exists() {
 if ! command_exists oc && ! command_exists kubectl ; then
   echo "ERROR: Could not find the command oc or kubectl on PATH"
   exit 1
-elif ! command_exists oc1 ; then
+elif ! command_exists oc ; then
   CTL="kubectl"
   CTL_DEBUG_FLAGS="-it"
 fi
