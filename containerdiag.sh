@@ -1,11 +1,10 @@
 #!/bin/sh
-# Run specified COMMANDS using on all pods in the specified DEPLOYMENT
+# Run specified COMMANDS on a specific pod or all pods of a deployment
 
 usage() {
   printf "Usage: %s [options] [-d DEPLOYMENT] [-p POD] COMMANDS...\n" "$(basename "${0}")"
   cat <<"EOF"
              -d DEPLOYMENT: Run COMMANDS on all pods in the specified DEPLOYMENT
-             -k: Use kubectl instead of oc
              -i IMAGE: The image used for the debug pod (default quay.io/ibm/containerdiag)
              -n NAMESPACE: Namespace (optional; defaults to current namespace)
              -p POD: Run COMMANDS on the specified POD
@@ -22,12 +21,13 @@ NAMESPACE=""
 VERBOSE=0
 APPEND=1
 CTL="oc"
+CTL_DEBUG_FLAGS="-t"
 IMAGE="quay.io/ibm/containerdiag"
 TARGETDEPLOYMENT=""
 TARGETPOD=""
 
 OPTIND=1
-while getopts "d:hi:kn:p:qv?" opt; do
+while getopts "d:hi:n:p:qv?" opt; do
   case "$opt" in
     d)
       TARGETDEPLOYMENT="${OPTARG}"
@@ -37,9 +37,6 @@ while getopts "d:hi:kn:p:qv?" opt; do
       ;;
     i)
       IMAGE="${OPTARG}"
-      ;;
-    k)
-      CTL="kubectl"
       ;;
     n)
       NAMESPACE="${OPTARG}"
@@ -62,6 +59,18 @@ if [ "${1:-}" = "--" ]; then
   shift
 fi
 
+command_exists() {
+  command -v "${1}" >/dev/null 2>&1
+}
+
+if ! command_exists oc && ! command_exists kubectl ; then
+  echo "ERROR: Could not find the command oc or kubectl on PATH"
+  exit 1
+elif ! command_exists oc1 ; then
+  CTL="kubectl"
+  CTL_DEBUG_FLAGS="-it"
+fi
+
 if [ "${TARGETDEPLOYMENT}" = "" ] && [ "${TARGETPOD}" = "" ]; then
   echo "ERROR: Either -d DEPLOYMENT or -p POD must be specified"
   usage
@@ -80,7 +89,7 @@ printVerbose() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S %Z')] $(basename "${0}"): ${@}" | tee -a diag.log
 }
 
-printInfo "Script started"
+printInfo "Script started with ${CTL}"
 
 [ "${VERBOSE}" -eq "1" ] && printVerbose "Commands: ${@}"
 
@@ -100,10 +109,10 @@ processPod() {
 
   if [ "${APPEND}" -eq 1 ]; then
     printInfo "Processing pod ${POD} on worker node ${WORKER} with ${@} ${POD}"
-    "${CTL}" debug "node/${WORKER}" -t --image=${IMAGE} -- "${@}" "${POD}" | tee -a diag.log
+    "${CTL}" debug "node/${WORKER}" ${CTL_DEBUG_FLAGS} --image=${IMAGE} -- "${@}" "${POD}" | tee -a diag.log
   else
     printInfo "Processing pod ${POD} on worker node ${WORKER} with ${@}"
-    "${CTL}" debug "node/${WORKER}" -t --image=${IMAGE} -- "${@}" | tee -a diag.log
+    "${CTL}" debug "node/${WORKER}" ${CTL_DEBUG_FLAGS} --image=${IMAGE} -- "${@}" | tee -a diag.log
   fi
 }
 
