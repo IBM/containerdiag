@@ -104,7 +104,7 @@ echo "Writing to ${TARGETDIR}"
 pushd "${TARGETDIR}" || exit 4
 
 # Now we can finally start the execution
-printInfo "started on $(hostname). Gathering first set of system info."
+printInfo "started on $(hostname)"
 
 nodeInfo() {
   mkdir -p node/$1
@@ -126,13 +126,17 @@ nodeInfo() {
 
 # Gather the first set of node info
 if [ "${SKIPSTATS}" -eq "0" ]; then
+  printInfo "gathering first set of system info."
+
   nodeInfo "stats_iteration1_$(date +"%Y%m%d_%H%M%S")"
 fi
+
+printInfo "executing command: ${@}"
 
 # We can't just run the process directly because some kube/oc debug
 # sessions will timeout if nothing happens for a while, so we put
 # it in the background and then wait until it's done
-( "$@" 2>&1 | tee -a "${OUTPUTFILE}" ) &
+( "${@}" 2>&1 | tee -a "${OUTPUTFILE}" ) &
 
 BGPID="${!}"
 
@@ -143,7 +147,7 @@ sleep 5
 
 if [ -d /proc/${BGPID} ]; then
   while true; do
-    printInfo "Waiting for script to complete"
+    printInfo "waiting for script to complete"
     sleep ${DELAY}
     if [ ! -d /proc/${BGPID} ]; then
       break
@@ -154,7 +158,7 @@ fi
 printInfo "command completed."
 
 if [ "${SKIPSTATS}" -eq "0" ]; then
-  printInfo "Gathering second set of system info."
+  printInfo "gathering second set of system info."
   nodeInfo "stats_iteration2_$(date +"%Y%m%d_%H%M%S")"
 fi
 
