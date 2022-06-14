@@ -1,12 +1,14 @@
 #!/bin/sh
-# Run specified COMMANDS using containerdiag on all pods in the specified DEPLOYMENT
+# Run specified COMMANDS using on all pods in the specified DEPLOYMENT
 
 usage() {
-  printf "Usage: %s [options] DEPLOYMENT COMMANDS...\n" "$(basename "${0}")"
+  printf "Usage: %s [options] [-d DEPLOYMENT] [-p POD] COMMANDS...\n" "$(basename "${0}")"
   cat <<"EOF"
+             -d DEPLOYMENT: Run COMMANDS on all pods in the specified DEPLOYMENT
              -k: Use kubectl instead of oc
-             -i: IMAGE for the debug pod (default quay.io/ibm/containerdiag)
-             -n: Namespace (optional; defaults to current namespace)
+             -i IMAGE: The image used for the debug pod (default quay.io/ibm/containerdiag)
+             -n NAMESPACE: Namespace (optional; defaults to current namespace)
+             -p POD: Run COMMANDS on the specified POD
              -q: Do not append the pod name to COMMANDS
              -v: verbose output to stderr
 
@@ -21,10 +23,15 @@ VERBOSE=0
 APPEND=1
 CTL="oc"
 IMAGE="quay.io/ibm/containerdiag"
+TARGETDEPLOYMENT=""
+TARGETPOD=""
 
 OPTIND=1
-while getopts "hi:kn:qv?" opt; do
+while getopts "d:hi:kn:p:qv?" opt; do
   case "$opt" in
+    d)
+      TARGETDEPLOYMENT="${OPTARG}"
+      ;;
     h|\?)
       usage
       ;;
@@ -36,6 +43,9 @@ while getopts "hi:kn:qv?" opt; do
       ;;
     n)
       NAMESPACE="${OPTARG}"
+      ;;
+    p)
+      TARGETPOD="${OPTARG}"
       ;;
     q)
       APPEND=0
@@ -52,13 +62,10 @@ if [ "${1:-}" = "--" ]; then
   shift
 fi
 
-if [ "${#}" -eq 0 ]; then
-  echo "ERROR: Missing DEPLOYMENT"
+if [ "${TARGETDEPLOYMENT}" = "" ] && [ "${TARGETPOD}" = "" ]; then
+  echo "ERROR: Either -d DEPLOYMENT or -p POD must be specified"
   usage
 fi
-
-DEPLOYMENT="${1}"
-shift
 
 if [ "${#}" -eq 0 ]; then
   echo "ERROR: Missing COMMANDS"
@@ -73,7 +80,7 @@ printVerbose() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S %Z')] $(basename "${0}"): ${@}" | tee -a diag.log
 }
 
-printInfo "Script started for deployment ${DEPLOYMENT}"
+printInfo "Script started"
 
 [ "${VERBOSE}" -eq "1" ] && printVerbose "Commands: ${@}"
 
@@ -86,62 +93,6 @@ if [ "${NAMESPACE}" = "" ]; then
     NAMESPACE="default"
   fi
 fi
-
-printInfo "Querying available replicas for deployment ${DEPLOYMENT} in namespace ${NAMESPACE}"
-
-# Let's check if the deployment has any active pods
-AVAILABLEREPLICAS="$("${CTL}" get deployment "${DEPLOYMENT}" "--namespace=${NAMESPACE}" "--output=jsonpath={.status.availableReplicas}")"
-RC="${?}"
-
-if [ ${RC} -ne 0 ]; then
-  printInfo "Error ${RC} getting deployment information (see previous output). Ensure you specify the right namespace with -n NAMESPACE"
-  exit ${RC}
-fi
-
-if [ "${AVAILABLEREPLICAS}" = "" ]; then
-  printInfo "Error getting deployment information. Ensure you specify the right namespace with -n NAMESPACE"
-  exit 1
-fi
-
-if [ "${AVAILABLEREPLICAS}" -eq 0 ]; then
-  printInfo "Error: There are 0 available replicas for this deployment"
-  exit 1
-fi
-
-printInfo "There are ${AVAILABLEREPLICAS} available replicas"
-
-printInfo "Querying deployment selector label"
-
-# We need to find the selector for the pods
-# https://github.com/kubernetes/kubernetes/issues/72794#issuecomment-483502617
-SELECTORRAW="$("${CTL}" get --raw "/apis/apps/v1/namespaces/${NAMESPACE}/deployments/${DEPLOYMENT}/scale")"
-RC="${?}"
-
-if [ ${RC} -ne 0 ]; then
-  printInfo "Error ${RC} getting scale information (see previous output)."
-  exit ${RC}
-fi
-
-SELECTOR="$(echo "${SELECTORRAW}" | sed 's/.*"selector":"//g' | sed 's/".*//g')"
-if [ "${SELECTOR}" = "" ]; then
-  printInfo "Error getting scale selector from: ${SELECTORRAW}"
-  exit 1
-fi
-
-printInfo "Selector labels are ${SELECTOR}"
-
-printInfo "Getting pods by selector"
-
-# Now that we have the selector, we can get the pods
-PODS="$("${CTL}" get pods --namespace "${NAMESPACE}" --selector "${SELECTOR}" --output "jsonpath={range .items[*]}{.metadata.name}{' '}{.spec.nodeName}{'\n'}{end}")"
-RC="${?}"
-
-if [ ${RC} -ne 0 ]; then
-  printInfo "Error ${RC} getting pod information (see previous output)."
-  exit ${RC}
-fi
-
-printInfo "Found the following pods:\n${PODS}"
 
 processPod() {
   POD="${1}"; shift
@@ -156,15 +107,86 @@ processPod() {
   fi
 }
 
-OLDIFS="${IFS}"
+if [ "${TARGETDEPLOYMENT}" != "" ]; then
+  printInfo "Querying available replicas for deployment ${TARGETDEPLOYMENT} in namespace ${NAMESPACE}"
 
-# Subshell strips newline so add a random character to the end (/) and then strip it
-IFS="$(printf '\n/')"
-IFS="${IFS%/}"
+  # Let's check if the deployment has any active pods
+  AVAILABLEREPLICAS="$("${CTL}" get deployment "${TARGETDEPLOYMENT}" "--namespace=${NAMESPACE}" "--output=jsonpath={.status.availableReplicas}")"
+  RC="${?}"
 
-for LINE in ${PODS}; do
-  IFS="${OLDIFS}"
-  processPod ${LINE} "${@}"
-done
+  if [ ${RC} -ne 0 ]; then
+    printInfo "Error ${RC} getting deployment information (see previous output). Ensure you specify the right namespace with -n NAMESPACE"
+    exit ${RC}
+  fi
+
+  if [ "${AVAILABLEREPLICAS}" = "" ]; then
+    printInfo "Error getting deployment information. Ensure you specify the right namespace with -n NAMESPACE"
+    exit 1
+  fi
+
+  if [ "${AVAILABLEREPLICAS}" -eq 0 ]; then
+    printInfo "Error: There are 0 available replicas for this deployment"
+    exit 1
+  fi
+
+  printInfo "There are ${AVAILABLEREPLICAS} available replicas"
+
+  printInfo "Querying deployment selector label"
+
+  # We need to find the selector for the pods
+  # https://github.com/kubernetes/kubernetes/issues/72794#issuecomment-483502617
+  SELECTORRAW="$("${CTL}" get --raw "/apis/apps/v1/namespaces/${NAMESPACE}/deployments/${TARGETDEPLOYMENT}/scale")"
+  RC="${?}"
+
+  if [ ${RC} -ne 0 ]; then
+    printInfo "Error ${RC} getting scale information (see previous output)."
+    exit ${RC}
+  fi
+
+  SELECTOR="$(echo "${SELECTORRAW}" | sed 's/.*"selector":"//g' | sed 's/".*//g')"
+  if [ "${SELECTOR}" = "" ]; then
+    printInfo "Error getting scale selector from: ${SELECTORRAW}"
+    exit 1
+  fi
+
+  printInfo "Selector labels are ${SELECTOR}"
+
+  printInfo "Getting pods by selector"
+
+  # Now that we have the selector, we can get the pods
+  PODS="$("${CTL}" get pods --namespace "${NAMESPACE}" --selector "${SELECTOR}" --output "jsonpath={range .items[*]}{.metadata.name}{' '}{.spec.nodeName}{'\n'}{end}")"
+  RC="${?}"
+
+  if [ ${RC} -ne 0 ]; then
+    printInfo "Error ${RC} getting pod information (see previous output)."
+    exit ${RC}
+  fi
+
+  printInfo "Found the following pods:\n${PODS}"
+
+  OLDIFS="${IFS}"
+
+  # Subshell strips newline so add a random character to the end (/) and then strip it
+  IFS="$(printf '\n/')"
+  IFS="${IFS%/}"
+
+  for LINE in ${PODS}; do
+    IFS="${OLDIFS}"
+    processPod ${LINE} "${@}"
+  done
+elif [ "${TARGETPOD}" != "" ]; then
+
+  # We just need to find the worker node
+  printInfo "Querying worker node for pod ${TARGETPOD} in namespace ${NAMESPACE}"
+  WORKER="$("${CTL}" get pod "${TARGETPOD}" --namespace "${NAMESPACE}" --output "jsonpath={.spec.nodeName}")"
+  RC="${?}"
+
+  if [ ${RC} -ne 0 ] || [ "${WORKER}" = "" ]; then
+    printInfo "Error ${RC} getting pod information (see previous output). Ensure you specify the right namespace with -n NAMESPACE"
+    exit ${RC}
+  fi
+
+  processPod "${TARGETPOD}" "${WORKER}" "${@}"
+fi
 
 printInfo "Finished"
