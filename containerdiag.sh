@@ -23,7 +23,7 @@ VERBOSE=0
 APPEND=1
 CTL="oc"
 CTL_DEBUG_FLAGS="-t"
-IMAGE="quay.io/ibm/containerdiag"
+IMAGE="quay.io/ibm/containerdiag:latest"
 TARGETDEPLOYMENT=""
 TARGETPOD=""
 
