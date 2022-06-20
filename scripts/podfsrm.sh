@@ -74,7 +74,7 @@ if [ "${#}" -eq 0 ]; then
   usage
 fi
 
-printInfo "started with ${@}"
+printInfo "started with ${@} for ${PODNAMES}"
 
 processPod() {
   PODNAME="${1}"

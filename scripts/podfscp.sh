@@ -85,7 +85,7 @@ if [ "${#}" -eq 0 ]; then
   usage
 fi
 
-printVerbose "started with ${@}"
+printVerbose "started with ${@} for ${PODNAMES}"
 
 processPod() {
   PODNAME="${1}"

@@ -97,7 +97,7 @@ printVerbose() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S %Z')] $(basename "${0}"): ${@}" | tee -a diag.log
 }
 
-printInfo "Script started with ${CTL}"
+printInfo "Script started with ${CTL} and ${IMAGE}"
 
 [ "${VERBOSE}" -eq "1" ] && printVerbose "Commands: ${@}"
 

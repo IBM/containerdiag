@@ -88,6 +88,10 @@ printInfo() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): ${@}" | tee -a "${OUTPUTFILE}"
 }
 
+printError() {
+  printVerbose "ERROR: " "${@}"
+}
+
 if [ "${#}" -eq 0 ]; then
   echo "ERROR: Missing COMMAND"
   usage
@@ -97,7 +101,7 @@ TARGETDIR="$(mktemp -d "${DESTDIR}/containerdiag.XXXXXXXXXX")"
 
 if [ "${TARGETDIR}" = "" ]; then
   echo "ERROR: Failed to create a temporary directory in ${DESTDIR}"
-  exit 3
+  exit 1
 fi
 
 # Add a trailing slash to $TARGETDIR
@@ -106,12 +110,47 @@ TARGETDIR="${TARGETDIR}/"
 
 echo "Writing to ${TARGETDIR}"
 
-pushd "${TARGETDIR}" || exit 4
+pushd "${TARGETDIR}" || exit 1
 
 # Now we can finally start the execution
 printInfo "started on $(hostname)"
 
 # Note: use unshare instead of chroot because of https://github.com/opencontainers/runc/issues/3462#issuecomment-1155422205
+
+# First try to find the name of the debug pod because we'll need it later
+# and it's pointless to continue if we can't find it
+
+# We touch a file in our temp directory which we'll
+# then search for.
+touch /tmp/${TMPNAME} || exit 1
+
+[ "${VERBOSE}" -eq "1" ] && printVerbose "Touched /tmp/${TMPNAME}"
+
+# Find all processes that have certain phrases in them (like debug-node and debugger)
+# We don't have to be super accurate here and false positives are okay because
+# then we'll walk through all of these (using the awk script) and search for the file we just touched.
+# So the goal is not to find the right process right off the bat, but to avoid
+# Looking through all containers by running runc list and then walking that list
+DEBUGPODINFO="$(ps -elf | grep -e debug-node -e debugger | /opt/debugpodinfo.awk -v "fssearch=/tmp/${TMPNAME}" 2>/dev/null)"
+
+if [ "${DEBUGPODINFO}" = "" ]; then
+  if [ "${VERBOSE}" -eq "1" ]; then
+    printVerbose "ps -elf:\n$(ps -elf)"
+    printVerbose "ps -elf | grep:\n$(ps -elf | grep -e debug-node -e debugger)"
+    printVerbose "ps -elf | grep | debugpodinfo:\n$(ps -elf | grep -e debug-node -e debugger | /opt/debugpodinfo.awk -v "fssearch=/tmp/${TMPNAME}" -v verbose=true)"
+    printError "Could not find the name of the debug pod."
+    sleep 5
+    exit 1
+  else
+    sleep 2
+    printError "Could not find the name of the debug pod. Please re-run with -v and report this issue with the output."
+    sleep 2
+    exit 1
+  fi
+fi
+
+DEBUGPODNAME="$(echo "${DEBUGPODINFO}" | awk 'NR==1')"
+DEBUGPODNAMESPACE="$(echo "${DEBUGPODINFO}" | awk 'NR==2')"
 
 nodeInfo() {
   mkdir -p node/$1
@@ -197,31 +236,12 @@ if [ "${NODOWNLOAD}" -eq "0" ]; then
   # After we're done, we want to package everything up into a tgz
   # and show an example command of how to download it.
   TARFILE="${TARGETDIR%/}.tar.gz"
-  tar -czf "${TARFILE}" -C "${TARGETDIR}" . || exit 5
+  tar -czf "${TARFILE}" -C "${TARGETDIR}" . || exit 1
 
   rm -rf "${TARGETDIR}"
 
   # Stop using printInfo since we're packaging that output
   echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): Finished with output in ${TARFILE}"
-
-  # Now we need to figure out our own pod name and namespace to create the
-  # right download command. We touch a file in our temp directory which we'll
-  # then search for.
-  touch /tmp/${TMPNAME}
-
-  [ "${VERBOSE}" -eq "1" ] && printVerbose "Touched /tmp/${TMPNAME}"
-
-  # Find all processes that have certain phrases in them (like debug-node and debugger)
-  # We don't have to be super accurate here and false positives are okay because
-  # then we'll walk through all of these (using the awk script) and search for the file we just touched.
-  # So the goal is not to find the right process right off the bat, but to avoid
-  # Looking through all containers by running runc list and then walking that list
-  DEBUGPODINFO="$(ps -elf | grep -e debug-node -e debugger | /opt/debugpodinfo.awk -v "fssearch=/tmp/${TMPNAME}" 2>/dev/null)"
-
-  [ "${VERBOSE}" -eq "1" ] && printVerbose "debugpodinfo.awk output: ${DEBUGPODINFO}"
-
-  DEBUGPODNAME="$(echo "${DEBUGPODINFO}" | awk 'NR==1')"
-  DEBUGPODNAMESPACE="$(echo "${DEBUGPODINFO}" | awk 'NR==2')"
 
   echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): Debug pod is ${DEBUGPODNAME} in namespace ${DEBUGPODNAMESPACE}"
 
