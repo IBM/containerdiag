@@ -33,4 +33,14 @@ jobs:
             --header "Accept: application/vnd.github.v3+json" \
             --header "Content-Type: $(file -b --mime-type containerdiag.sh)" \
             --header "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            --data-binary @containerdiag.sh
+            --data-binary @containerdiag.sh && \
+          curl \
+            --silent \
+            --show-error \
+            --fail \
+            --request POST \
+            --url https://uploads.github.com/repos/${{github.repository}}/releases/${RELEASE}/assets?name=containerdiag.bat \
+            --header "Accept: application/vnd.github.v3+json" \
+            --header "Content-Type: $(file -b --mime-type containerdiag.bat)" \
+            --header "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            --data-binary @containerdiag.bat
