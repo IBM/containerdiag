@@ -1,5 +1,6 @@
 #!/bin/sh
 # Run specified COMMANDS on a specific pod or all pods of a deployment
+# For details, see https://www.ibm.com/support/pages/mustgather-performance-hang-or-high-cpu-issues-websphere-application-server-linux-containers
 
 usage() {
   printf "Usage: %s [options] [-d DEPLOYMENT] [-p POD] COMMANDS...\n" "$(basename "${0}")"

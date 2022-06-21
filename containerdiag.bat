@@ -1,4 +1,6 @@
-:: containerdiag.bat
+:: Run specified COMMANDS on a specific pod or all pods of a deployment
+:: For details, see https://www.ibm.com/support/pages/mustgather-performance-hang-or-high-cpu-issues-websphere-application-server-linux-containers
+
 @echo off
 
 SETLOCAL ENABLEDELAYEDEXPANSION

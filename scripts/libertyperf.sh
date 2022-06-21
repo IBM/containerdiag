@@ -6,6 +6,7 @@ usage() {
              -j: JAVACORE_INTERVAL for linperf.sh
              -m: VMSTAT_INTERVAL for linperf.sh
              -n: No download necessary (for run.sh)
+             -p: Skip the Liberty server dump
              -s: SCRIPT_SPAN for linperf.sh
              -t: TOP_INTERVAL for linperf.sh
              -u: TOP_DASH_H_INTERVAL for linperf.sh
@@ -18,6 +19,7 @@ EOF
 DELAY=""
 NODOWNLOAD=""
 SKIPSTATS=""
+SKIPSERVERDUMP=0
 VERBOSE=""
 JAVACORE_INTERVAL=""
 SCRIPT_SPAN=""
@@ -26,7 +28,7 @@ TOP_DASH_H_INTERVAL=""
 VMSTAT_INTERVAL=""
 
 OPTIND=1
-while getopts "d:hj:m:ns:t:u:vz?" opt; do
+while getopts "d:hj:m:nps:t:u:vz?" opt; do
   case "$opt" in
     d)
       DELAY="-d ${OPTARG}"
@@ -42,6 +44,9 @@ while getopts "d:hj:m:ns:t:u:vz?" opt; do
       ;;
     n)
       NODOWNLOAD="-n"
+      ;;
+    p)
+      SKIPSERVERDUMP=1
       ;;
     s)
       SCRIPT_SPAN="-s ${OPTARG}"
@@ -77,4 +82,8 @@ for ARG in "${@}"; do
   PODARGS="${PODARGS} -p ${ARG}"
 done
 
-run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "linperf.sh -q ${SCRIPT_SPAN} ${JAVACORE_INTERVAL} ${TOP_INTERVAL} ${TOP_DASH_H_INTERVAL} ${VMSTAT_INTERVAL} $(podinfo.sh ${VERBOSE} -p ${@}) && DUMPS=\"\$(libertydump.sh ${VERBOSE} ${PODARGS})\"; podfscp.sh ${VERBOSE} -s ${PODARGS} /logs /config /output/javacore* \${DUMPS} ; podfsrm.sh ${VERBOSE} ${PODARGS} /output/javacore* \${DUMPS}"
+if [ "${SKIPSERVERDUMP}" -eq "0" ]; then
+  run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "linperf.sh -q ${SCRIPT_SPAN} ${JAVACORE_INTERVAL} ${TOP_INTERVAL} ${TOP_DASH_H_INTERVAL} ${VMSTAT_INTERVAL} $(podinfo.sh ${VERBOSE} -p ${@}) && DUMPS=\"\$(libertydump.sh ${VERBOSE} ${PODARGS})\"; podfscp.sh ${VERBOSE} -s ${PODARGS} /logs /config /output/javacore* \${DUMPS} ; podfsrm.sh ${VERBOSE} ${PODARGS} /output/javacore* \${DUMPS}"
+else
+  run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "linperf.sh -q ${SCRIPT_SPAN} ${JAVACORE_INTERVAL} ${TOP_INTERVAL} ${TOP_DASH_H_INTERVAL} ${VMSTAT_INTERVAL} $(podinfo.sh ${VERBOSE} -p ${@}) && podfscp.sh ${VERBOSE} -s ${PODARGS} /logs /config /output/javacore* ; podfsrm.sh ${VERBOSE} ${PODARGS} /output/javacore*"
+fi

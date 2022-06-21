@@ -163,4 +163,4 @@ if [ "${FOUND}" -gt 0 ]; then
   printf "\n"
 fi
 
-printInfo "finished"
+printInfo "script returning"
