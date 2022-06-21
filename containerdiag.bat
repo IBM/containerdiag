@@ -59,33 +59,38 @@ for %%x in (%*) do (
 
 set /a "REMAININGINDEX=1"
 
+set "KEEPGOING=1"
 for /L %%J in (1,1,!I!) do (
-  if /i "!ARGS[%%J]!" == "/?" goto :usage
-  if /i "!ARGS[%%J]!" == "-?" goto :usage
-  if /i "!ARGS[%%J]!" == "-h" goto :usage
-  if /i "!ARGS[%%J]!" == "--help" goto :usage
+  if "!KEEPGOING!" == "1" (
+    if /i "!ARGS[%%J]!" == "/?" goto :usage
+    if /i "!ARGS[%%J]!" == "-?" goto :usage
+    if /i "!ARGS[%%J]!" == "-h" goto :usage
+    if /i "!ARGS[%%J]!" == "--help" goto :usage
 
-  set /a "K=%%J+1"
-  if /i "!ARGS[%%J]!" == "/d" call set "TARGETDEPLOYMENT=%%ARGS[!K!]%%" & set /a "REMAININGINDEX+=2"
-  if /i "!ARGS[%%J]!" == "-d" call set "TARGETDEPLOYMENT=%%ARGS[!K!]%%" & set /a "REMAININGINDEX+=2"
+    set /a "K=%%J+1"
+    if /i "!ARGS[%%J]!" == "/d" call set "TARGETDEPLOYMENT=%%ARGS[!K!]%%" & set /a "REMAININGINDEX+=2"
+    if /i "!ARGS[%%J]!" == "-d" call set "TARGETDEPLOYMENT=%%ARGS[!K!]%%" & set /a "REMAININGINDEX+=2"
 
-  if /i "!ARGS[%%J]!" == "/p" call set "TARGETPOD=%%ARGS[!K!]%%" & set /a "REMAININGINDEX+=2"
-  if /i "!ARGS[%%J]!" == "-p" call set "TARGETPOD=%%ARGS[!K!]%%" & set /a "REMAININGINDEX+=2"
+    if /i "!ARGS[%%J]!" == "/p" call set "TARGETPOD=%%ARGS[!K!]%%" & set /a "REMAININGINDEX+=2"
+    if /i "!ARGS[%%J]!" == "-p" call set "TARGETPOD=%%ARGS[!K!]%%" & set /a "REMAININGINDEX+=2"
 
-  if /i "!ARGS[%%J]!" == "/i" call set "IMAGE=%%ARGS[!K!]%%" & set /a "REMAININGINDEX+=2"
-  if /i "!ARGS[%%J]!" == "-i" call set "IMAGE=%%ARGS[!K!]%%" & set /a "REMAININGINDEX+=2"
+    if /i "!ARGS[%%J]!" == "/i" call set "IMAGE=%%ARGS[!K!]%%" & set /a "REMAININGINDEX+=2"
+    if /i "!ARGS[%%J]!" == "-i" call set "IMAGE=%%ARGS[!K!]%%" & set /a "REMAININGINDEX+=2"
 
-  if /i "!ARGS[%%J]!" == "/n" call set "NAMESPACE=%%ARGS[!K!]%%" & set /a "REMAININGINDEX+=2"
-  if /i "!ARGS[%%J]!" == "-n" call set "NAMESPACE=%%ARGS[!K!]%%" & set /a "REMAININGINDEX+=2"
+    if /i "!ARGS[%%J]!" == "/n" call set "NAMESPACE=%%ARGS[!K!]%%" & set /a "REMAININGINDEX+=2"
+    if /i "!ARGS[%%J]!" == "-n" call set "NAMESPACE=%%ARGS[!K!]%%" & set /a "REMAININGINDEX+=2"
 
-  if /i "!ARGS[%%J]!" == "/v" call set "VERBOSE=1" & set /a "REMAININGINDEX+=1"
-  if /i "!ARGS[%%J]!" == "-v" call set "VERBOSE=1" & set /a "REMAININGINDEX+=1"
+    if /i "!ARGS[%%J]!" == "/v" set "VERBOSE=1" & set /a "REMAININGINDEX+=1"
+    if /i "!ARGS[%%J]!" == "-v" set "VERBOSE=1" & set /a "REMAININGINDEX+=1"
 
-  if /i "!ARGS[%%J]!" == "/q" call set "APPEND=0" & set /a "REMAININGINDEX+=1"
-  if /i "!ARGS[%%J]!" == "-q" call set "APPEND=0" & set /a "REMAININGINDEX+=1"
+    if /i "!ARGS[%%J]!" == "/q" set "APPEND=0" & set /a "REMAININGINDEX+=1"
+    if /i "!ARGS[%%J]!" == "-q" set "APPEND=0" & set /a "REMAININGINDEX+=1"
 
-  if /i "!ARGS[%%J]!" == "/k" call set "CTL=kubectl" & set "CTL_DEBUG_FLAGS=-it" & set /a "REMAININGINDEX+=1"
-  if /i "!ARGS[%%J]!" == "-k" call set "CTL=kubectl" & set "CTL_DEBUG_FLAGS=-it" & set /a "REMAININGINDEX+=1"
+    if /i "!ARGS[%%J]!" == "/k" set "CTL=kubectl" & set "CTL_DEBUG_FLAGS=-it" & set /a "REMAININGINDEX+=1"
+    if /i "!ARGS[%%J]!" == "-k" set "CTL=kubectl" & set "CTL_DEBUG_FLAGS=-it" & set /a "REMAININGINDEX+=1"
+
+    if /i "!ARGS[%%J]!" == "--" set "KEEPGOING=0" & set /a "REMAININGINDEX+=1"
+  )
 )
 
 where /q oc
