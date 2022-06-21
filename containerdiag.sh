@@ -91,16 +91,16 @@ if [ "${#}" -eq 0 ]; then
 fi
 
 printInfo() {
-  echo "[$(date '+%Y-%m-%d %H:%M:%S %Z')] $(basename "${0}"): ${@}" | tee -a diag.log
+  echo "[$(date '+%Y-%m-%d %H:%M:%S %Z')] $(basename "${0}"): ${*}" | tee -a diag.log
 }
 
 printVerbose() {
-  echo "[$(date '+%Y-%m-%d %H:%M:%S %Z')] $(basename "${0}"): ${@}" | tee -a diag.log
+  echo "[$(date '+%Y-%m-%d %H:%M:%S %Z')] $(basename "${0}"): ${*}" | tee -a diag.log
 }
 
 printInfo "Script started with ${CTL} and ${IMAGE}"
 
-[ "${VERBOSE}" -eq "1" ] && printVerbose "Commands: ${@}"
+[ "${VERBOSE}" -eq "1" ] && printVerbose "Commands: ${*1}"
 
 # We'll need the namespace, so if they haven't specified it
 # get the current one
@@ -117,11 +117,11 @@ processPod() {
   WORKER="${1}"; shift
 
   if [ "${APPEND}" -eq 1 ]; then
-    printInfo "Processing pod ${POD} on worker node ${WORKER} with ${@} ${POD}"
-    "${CTL}" debug "node/${WORKER}" ${CTL_DEBUG_FLAGS} --image=${IMAGE} -- "${@}" "${POD}" | tee -a diag.log
+    printInfo "Processing pod ${POD} on worker node ${WORKER} with ${*} ${POD}"
+    "${CTL}" debug "node/${WORKER}" ${CTL_DEBUG_FLAGS} "--image=${IMAGE}" -- "${@}" "${POD}" | tee -a diag.log
   else
-    printInfo "Processing pod ${POD} on worker node ${WORKER} with ${@}"
-    "${CTL}" debug "node/${WORKER}" ${CTL_DEBUG_FLAGS} --image=${IMAGE} -- "${@}" | tee -a diag.log
+    printInfo "Processing pod ${POD} on worker node ${WORKER} with ${*}"
+    "${CTL}" debug "node/${WORKER}" ${CTL_DEBUG_FLAGS} "--image=${IMAGE}" -- "${@}" | tee -a diag.log
   fi
 }
 
