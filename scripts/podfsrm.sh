@@ -103,4 +103,4 @@ for PODNAME in ${PODNAMES}; do
   processPod "${PODNAME}" "${@}"
 done
 
-printInfo "finished"
+printInfo "script returning"

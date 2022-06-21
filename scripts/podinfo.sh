@@ -150,4 +150,4 @@ if [ "${FOUND}" -gt 0 ]; then
   printf "\n"
 fi
 
-[ "${VERBOSE}" -eq "1" ] && printVerbose "finished"
+[ "${VERBOSE}" -eq "1" ] && printVerbose "script returning"
