@@ -131,13 +131,13 @@ touch /tmp/${TMPNAME} || exit 1
 # then we'll walk through all of these (using the awk script) and search for the file we just touched.
 # So the goal is not to find the right process right off the bat, but to avoid
 # Looking through all containers by running runc list and then walking that list
-DEBUGPODINFO="$(ps -elf | grep -e debug-node -e debugger | /opt/debugpodinfo.awk -v "fssearch=/tmp/${TMPNAME}" 2>/dev/null)"
+DEBUGPODINFO="$(ps -elf | grep -e debug | /opt/debugpodinfo.awk -v "fssearch=/tmp/${TMPNAME}" 2>/dev/null)"
 
 if [ "${DEBUGPODINFO}" = "" ]; then
   if [ "${VERBOSE}" -eq "1" ]; then
     printVerbose "ps -elf:\n$(ps -elf)"
-    printVerbose "ps -elf | grep:\n$(ps -elf | grep -e debug-node -e debugger)"
-    printVerbose "ps -elf | grep | debugpodinfo:\n$(ps -elf | grep -e debug-node -e debugger | /opt/debugpodinfo.awk -v "fssearch=/tmp/${TMPNAME}" -v verbose=true)"
+    printVerbose "ps -elf | grep:\n$(ps -elf | grep -e debug)"
+    printVerbose "ps -elf | grep | debugpodinfo:\n$(ps -elf | grep -e debug | /opt/debugpodinfo.awk -v "fssearch=/tmp/${TMPNAME}" -v verbose=true)"
     printError "Could not find the name of the debug pod."
     sleep 5
     exit 1
