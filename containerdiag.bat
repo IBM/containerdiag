@@ -38,6 +38,7 @@ goto :start
     !CTL! debug node/!WORKER! !CTL_DEBUG_FLAGS! --image=!IMAGE! -- %* !TARGETPOD!
   ) else (
     call :printInfo Processing pod !TARGETPOD! on worker node !WORKER! with %*
+    !CTL! debug node/!WORKER! !CTL_DEBUG_FLAGS! --image=!IMAGE! -- %*
   )
   goto :eof
 
