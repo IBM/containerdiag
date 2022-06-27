@@ -78,7 +78,9 @@ RUN dnf install -y \
 RUN mkdir -p /opt/java/11/ && \
     wget -q -O - https://www.ibm.com/semeru-runtimes/api/v3/binary/latest/11/ga/linux/$(if [ "$(uname -m)" = "x86_64" ]; then echo "x64"; else uname -m; fi)/jdk/openj9/normal/ibm | tar -xzf - --directory /opt/ && \
     mv /opt/jdk* /opt/java/11/semeru && \
-    ln -s /opt/java/11/semeru/bin/java /usr/local/bin/
+    for J in java javac jar jdmpview javap jcmd jpackcore keytool jstat jdb jps jstack jconsole jjs jmap jrunscript jitserver jshell traceformat; do \
+      ln -s /opt/java/11/semeru/bin/${J} /usr/local/bin/; \
+    done
 
 RUN get_git() { \
       wget -q -O /tmp/$1_$2_master.zip https://github.com/$1/$2/archive/master.zip; \
