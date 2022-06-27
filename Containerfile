@@ -76,7 +76,7 @@ RUN dnf install -y \
             /usr/share/vim/*/tutor/
 
 RUN mkdir -p /opt/java/11/ && \
-    wget -q -O - https://www.ibm.com/semeru-runtimes/api/v3/binary/latest/11/ga/linux/$(uname -m)/jdk/openj9/normal/ibm | tar -xzf - --directory /opt/ && \
+    wget -q -O - https://www.ibm.com/semeru-runtimes/api/v3/binary/latest/11/ga/linux/$(if [ "$(uname -m)" = "x86_64" ]; then echo "x64"; else uname -m; fi)/jdk/openj9/normal/ibm | tar -xzf - --directory /opt/ && \
     mv /opt/jdk* /opt/java/11/semeru && \
     ln -s /opt/java/11/semeru/bin/java /usr/local/bin/
 
