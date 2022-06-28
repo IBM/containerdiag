@@ -81,8 +81,12 @@ if [ "${PODNAMES}" = "" ]; then
 fi
 
 if [ "${#}" -eq 0 ]; then
-  echo "ERROR: Missing FILEs"
-  usage
+  # Allow no files in case someone just wants to grab stdout/stderr
+  # but let's print a warning just in case that was done in error
+  
+  #echo "ERROR: Missing FILEs"
+  #usage
+  printWarning "No files specified for ${PODNAMES}"
 fi
 
 printVerbose "started with ${@} for ${PODNAMES}"

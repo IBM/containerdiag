@@ -108,7 +108,8 @@ RUN mkdir -p /opt/openshift/ && \
     wget -q -O - https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/clients/ocp/latest/openshift-client-linux.tar.gz | tar -xzf - --directory /opt/openshift/ && \
     rm /opt/openshift/kubectl && \
     ln -s /opt/openshift/oc /opt/openshift/kubectl && \
-    ln -s /opt/openshift/oc /usr/local/bin/
+    ln -s /opt/openshift/oc /usr/local/bin/ && \
+    ln -s /opt/openshift/kubectl /usr/local/bin/
 
 # Install Semeru Java 11
 RUN mkdir -p /opt/java/11/ && \
