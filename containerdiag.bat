@@ -21,6 +21,7 @@
 
 SETLOCAL ENABLEDELAYEDEXPANSION
 
+set "VERSION=0.1.20220628"
 set "SCRIPTNAME=%~nx0"
 
 goto :start
@@ -136,7 +137,7 @@ if "!TARGETDEPLOYMENT!" == "" (
 
 if "!REMAININGARGS!" == "" echo ERROR: Missing COMMANDS & goto :usage
 
-call :printInfo Script started with !CTL! and !IMAGE!
+call :printInfo Script version !VERSION! started with !CTL! and !IMAGE!
 
 if "!VERBOSE!" == "1" call :printVerbose Commands: !REMAININGARGS!
 

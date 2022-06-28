@@ -19,7 +19,7 @@
 usage() {
   printf "Usage: %s [OPTIONS] [PODNAME]...\n" "$(basename "${0}")"
   cat <<"EOF"
-             -d: DELAY for run.sh
+             -d: DELAY (for run.sh)
              -j: JAVACORE_INTERVAL for linperf.sh
              -m: VMSTAT_INTERVAL for linperf.sh
              -n: No download necessary (for run.sh)
@@ -28,7 +28,7 @@ usage() {
              -t: TOP_INTERVAL for linperf.sh
              -u: TOP_DASH_H_INTERVAL for linperf.sh
              -v: verbose output to stderr
-             -z: Skip statistics collection
+             -z: Skip statistics collection (for run.sh)
 EOF
   exit 2
 }

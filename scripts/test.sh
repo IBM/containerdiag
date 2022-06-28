@@ -20,12 +20,7 @@ usage() {
   printf "Usage: %s [OPTIONS] [PODNAME]...\n" "$(basename "${0}")"
   cat <<"EOF"
              -d: DELAY (for run.sh)
-             -j: JAVACORE_INTERVAL for linperf.sh
-             -m: VMSTAT_INTERVAL for linperf.sh
              -n: No download necessary (for run.sh)
-             -s: SCRIPT_SPAN for linperf.sh
-             -t: TOP_INTERVAL for linperf.sh
-             -u: TOP_DASH_H_INTERVAL for linperf.sh
              -v: verbose output to stderr
              -z: Skip statistics collection (for run.sh)
 EOF
@@ -34,16 +29,11 @@ EOF
 
 DELAY=""
 NODOWNLOAD=""
-SKIPSTATS=""
 VERBOSE=""
-JAVACORE_INTERVAL=""
-SCRIPT_SPAN=""
-TOP_INTERVAL=""
-TOP_DASH_H_INTERVAL=""
-VMSTAT_INTERVAL=""
+SKIPSTATS=""
 
 OPTIND=1
-while getopts "d:hj:m:ns:t:u:vz?" opt; do
+while getopts "d:hnvz?" opt; do
   case "$opt" in
     d)
       DELAY="-d ${OPTARG}"
@@ -51,23 +41,8 @@ while getopts "d:hj:m:ns:t:u:vz?" opt; do
     h|\?)
       usage
       ;;
-    j)
-      JAVACORE_INTERVAL="-j ${OPTARG}"
-      ;;
-    m)
-      VMSTAT_INTERVAL="-m ${OPTARG}"
-      ;;
     n)
       NODOWNLOAD="-n"
-      ;;
-    s)
-      SCRIPT_SPAN="-s ${OPTARG}"
-      ;;
-    t)
-      TOP_INTERVAL="-t ${OPTARG}"
-      ;;
-    u)
-      TOP_DASH_H_INTERVAL="-u ${OPTARG}"
       ;;
     v)
       VERBOSE="-v"
@@ -94,4 +69,4 @@ for ARG in "${@}"; do
   PODARGS="${PODARGS} -p ${ARG}"
 done
 
-run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "linperf.sh -q ${SCRIPT_SPAN} ${JAVACORE_INTERVAL} ${TOP_INTERVAL} ${TOP_DASH_H_INTERVAL} ${VMSTAT_INTERVAL} $(podinfo.sh ${VERBOSE} -j -p ${@}) && podfscp.sh ${VERBOSE} -s ${PODARGS} /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/logs/ /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/config/ /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/javacore* ; podfsrm.sh ${VERBOSE} ${PODARGS} /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/javacore*"
+run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "echo 'Pod PIDs for ${@}:'; podinfo.sh ${VERBOSE} -p ${@}; echo 'Gathering basic pod logs and info'; podfscp.sh ${VERBOSE} -s ${PODARGS}"

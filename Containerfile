@@ -15,10 +15,10 @@
 #  *******************************************************************************/
 # 
 # Building:
-#   podman build --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x --jobs=1 --manifest localhost/containerdiag:test .
-#   podman tag $(podman images -q containerdiag) quay.io/ibm/containerdiag
+#   podman build --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x --jobs=1 --manifest localhost/containerdiag:latest .
+#   podman manifest inspect localhost/containerdiag:latest
 #   podman login quay.io
-#   podman manifest push --all quay.io/ibm/containerdiag
+#   podman manifest push --all localhost/containerdiag:latest docker://quay.io/ibm/containerdiag:latest
 #   Check at https://quay.io/repository/ibm/containerdiag?tab=tags
 # 
 # Notes:

@@ -35,6 +35,7 @@ EOF
   exit 22
 }
 
+VERSION="0.1.20220628"
 NAMESPACE=""
 VERBOSE=0
 APPEND=1
@@ -114,7 +115,7 @@ printVerbose() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S %Z')] $(basename "${0}"): ${*}" | tee -a diag.log
 }
 
-printInfo "Script started with ${CTL} and ${IMAGE}"
+printInfo "Script version ${VERSION} started with ${CTL} and ${IMAGE}"
 
 [ "${VERBOSE}" -eq "1" ] && printVerbose "Commands: ${*1}"
 
@@ -133,10 +134,10 @@ processPod() {
   WORKER="${1}"; shift
 
   if [ "${APPEND}" -eq 1 ]; then
-    printInfo "Processing pod ${POD} on worker node ${WORKER} with ${*} ${POD}"
+    printInfo "Processing: ${CTL} debug node/${WORKER} ${CTL_DEBUG_FLAGS} --image=${IMAGE} -- ${@} ${POD}"
     "${CTL}" debug "node/${WORKER}" ${CTL_DEBUG_FLAGS} "--image=${IMAGE}" -- "${@}" "${POD}" | tee -a diag.log
   else
-    printInfo "Processing pod ${POD} on worker node ${WORKER} with ${*}"
+    printInfo "Processing: ${CTL} debug node/${WORKER} ${CTL_DEBUG_FLAGS} --image=${IMAGE} -- ${@}"
     "${CTL}" debug "node/${WORKER}" ${CTL_DEBUG_FLAGS} "--image=${IMAGE}" -- "${@}" | tee -a diag.log
   fi
 }
