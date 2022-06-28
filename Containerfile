@@ -5,7 +5,7 @@
 #  * you may not use this file except in compliance with the License.
 #  * You may obtain a copy of the License at
 #  *
-#  *    http://www.apache.org/licenses/LICENSE-2.0
+#  *    https://www.apache.org/licenses/LICENSE-2.0
 #  *
 #  * Unless required by applicable law or agreed to in writing, software
 #  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,13 +13,14 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 #  *******************************************************************************/
+# 
 # Building:
+#   podman build --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x --jobs=1 --manifest localhost/containerdiag:test .
+#   podman tag $(podman images -q containerdiag) quay.io/ibm/containerdiag
 #   podman login quay.io
-#   podman build -t containerdiag .
-#   podman tag $(podman images | grep "localhost/containerdiag[ \t]" | awk '{print $3}') quay.io/ibm/containerdiag
-#   podman push quay.io/ibm/containerdiag
+#   podman manifest push --all quay.io/ibm/containerdiag
 #   Check at https://quay.io/repository/ibm/containerdiag?tab=tags
-#
+# 
 # Notes:
 #   * As of writing this note, this image is about 1GB
 #   * Base fedora:latest is about 175MB
@@ -32,8 +33,16 @@
 #   * Then there is also a Java 11 JDK which is another few hundred MB
 #   * Deleting files in the parent (e.g. /usr/lib64/python*/__pycache__) isn't useful because it's still in that layer
 
-FROM fedora
-LABEL maintainer="kevin.grigorenko@us.ibm.com"
+# podman manifest inspect docker.io/fedora:latest
+FROM --platform=$TARGETPLATFORM docker.io/fedora:latest
+
+# https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
+LABEL org.opencontainers.image.title="containerdiag"
+LABEL org.opencontainers.image.description="Live container debugging using worker node debug pods"
+LABEL org.opencontainers.image.url="https://github.com/IBM/containerdiag"
+LABEL org.opencontainers.image.source="https://github.com/IBM/containerdiag/blob/main/Containerfile"
+LABEL org.opencontainers.image.authors="kevin.grigorenko@us.ibm.com"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
 
 RUN dnf install -y \
         binutils \
