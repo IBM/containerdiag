@@ -13,7 +13,10 @@
 #  * See the License for the specific language governing permissions and
 #  * limitations under the License.
 #  *******************************************************************************/
-# 
+#
+# Live container debugging using worker node debug pods
+# For usage information, see https://www.ibm.com/support/pages/mustgather-performance-hang-or-high-cpu-issues-websphere-application-server-linux-containers
+#
 # Building:
 #   podman build --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x --jobs=1 --manifest localhost/containerdiag:latest .
 #   podman manifest inspect localhost/containerdiag:latest
@@ -32,18 +35,31 @@
 #   * perl adds about 150MB but is needed for FlameGraph
 #   * Then there is also a Java 11 JDK which is another few hundred MB
 #   * Deleting files in the parent (e.g. /usr/lib64/python*/__pycache__) isn't useful because it's still in that layer
+#   * See available architectures for Fedora: podman manifest inspect docker.io/fedora:latest
 
-# podman manifest inspect docker.io/fedora:latest
 FROM --platform=$TARGETPLATFORM docker.io/fedora:latest
 
-# https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
-LABEL org.opencontainers.image.title="containerdiag"
-LABEL org.opencontainers.image.description="Live container debugging using worker node debug pods"
-LABEL org.opencontainers.image.url="https://github.com/IBM/containerdiag"
-LABEL org.opencontainers.image.source="https://github.com/IBM/containerdiag/blob/main/Containerfile"
-LABEL org.opencontainers.image.authors="kevin.grigorenko@us.ibm.com"
-LABEL org.opencontainers.image.licenses="Apache-2.0"
+ARG TITLE="containerdiag"
+ARG DESCRIPTION="Live container debugging using worker node debug pods"
+ARG AUTHORS="kevin.grigorenko@us.ibm.com"
+# https://spdx.org/licenses/
+ARG LICENSE="Apache-2.0"
+ARG URL="https://github.com/IBM/containerdiag"
+ARG SOURCE="https://github.com/IBM/containerdiag/blob/main/Containerfile"
 
+# https://github.com/opencontainers/image-spec/blob/main/annotations.md#pre-defined-annotation-keys
+LABEL org.opencontainers.image.title="${TITLE}" \
+      name="${TITLE}" \
+      org.opencontainers.image.description="${DESCRIPTION}" \
+      description="${DESCRIPTION}" \
+      org.opencontainers.image.url="${URL}" \
+      org.opencontainers.image.source="${SOURCE}" \
+      org.opencontainers.image.authors="${AUTHORS}" \
+      maintainer="${AUTHORS}" \
+      org.opencontainers.image.licenses="${LICENSE}" \
+      license="${LICENSE}"
+
+# Install various tools
 RUN dnf install -y \
         binutils \
         curl \
@@ -84,6 +100,17 @@ RUN dnf install -y \
             /usr/share/vim/*/spell/ \
             /usr/share/vim/*/tutor/
 
+# Install oc. We delete kubectl because the README notes:
+#   > The `kubectl` binary is included alongside for when strict Kubernetes compliance is necessary.
+# We don't expect our users will need such strict compliance and it saves over 100MB
+# Then we symlink oc to kubectl in case someone uses that command by habit
+RUN mkdir -p /opt/openshift/ && \
+    wget -q -O - https://mirror.openshift.com/pub/openshift-v4/$(uname -m)/clients/ocp/latest/openshift-client-linux.tar.gz | tar -xzf - --directory /opt/openshift/ && \
+    rm /opt/openshift/kubectl && \
+    ln -s /opt/openshift/oc /opt/openshift/kubectl && \
+    ln -s /opt/openshift/oc /usr/local/bin/
+
+# Install Semeru Java 11
 RUN mkdir -p /opt/java/11/ && \
     wget -q -O - https://www.ibm.com/semeru-runtimes/api/v3/binary/latest/11/ga/linux/$(if [ "$(uname -m)" = "x86_64" ]; then echo "x64"; else uname -m; fi)/jdk/openj9/normal/ibm | tar -xzf - --directory /opt/ && \
     mv /opt/jdk* /opt/java/11/semeru && \
@@ -91,6 +118,7 @@ RUN mkdir -p /opt/java/11/ && \
       ln -s /opt/java/11/semeru/bin/${J} /usr/local/bin/; \
     done
 
+# Download a few useful git repositories like FlameGraph for Linux perf
 RUN get_git() { \
       wget -q -O /tmp/$1_$2_master.zip https://github.com/$1/$2/archive/master.zip; \
       unzip -q /tmp/$1_$2_master.zip -d /opt/; \
@@ -105,8 +133,8 @@ RUN get_git() { \
     ln -s /opt/problemdetermination/scripts/ihs/ihs_mpmstats.awk /usr/local/bin/ && \
     ln -s /opt/problemdetermination/scripts/was/twas_pmi_threadpool.awk /usr/local/bin/
 
+# Copy in our various helper scripts and put them on the $PATH
 COPY scripts/*.sh scripts/*.awk /opt/
-
 RUN for SCRIPT in /opt/*.sh /opt/*.awk; do \
       chmod a+x ${SCRIPT}; \
       ln -s ${SCRIPT} /usr/local/bin/; \
