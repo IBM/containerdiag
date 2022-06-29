@@ -51,10 +51,10 @@ goto :start
 
 :processPod
   if "!APPEND!" == "1" (
-    call :printInfo Processing pod !TARGETPOD! on worker node !WORKER! with %* !TARGETPOD!
+    call :printInfo Processing: !CTL! debug node/!WORKER! !CTL_DEBUG_FLAGS! --image=!IMAGE! -- %* !TARGETPOD!
     !CTL! debug node/!WORKER! !CTL_DEBUG_FLAGS! --image=!IMAGE! -- %* !TARGETPOD!
   ) else (
-    call :printInfo Processing pod !TARGETPOD! on worker node !WORKER! with %*
+    call :printInfo Processing: !CTL! debug node/!WORKER! !CTL_DEBUG_FLAGS! --image=!IMAGE! -- %*
     !CTL! debug node/!WORKER! !CTL_DEBUG_FLAGS! --image=!IMAGE! -- %*
   )
   goto :eof
