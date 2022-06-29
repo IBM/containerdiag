@@ -35,16 +35,16 @@
 # Notes:
 #   * View tags at https://quay.io/repository/ibm/containerdiag?tab=tags
 #   * As of writing this note, this image is about 1.5GB
-#   * Base fedora:latest is about 175MB
-#   * Tried ubi-minimal which is about 100MB but microdnf is missing many useful packages like fatrace and others 
-#   * gdb adds about 68MB but considered worth it for gdb and gcore
-#   * runc adds about 14MB but considered worth it for use with oc debug on a node
-#   * git adds about 41MB so instead we just use wget https://github.com/$GROUP/$REPO/archive/master.zip
-#   * perf adds about 40MB but considered worth it since it's commonly needed
-#   * perl adds about 150MB but is needed for FlameGraph
-#   * Then there is also a Java 11 JDK which is another few hundred MB
-#   * The oc command is about 120MB
-#   * Deleting files in the parent (e.g. /usr/lib64/python*/__pycache__) isn't useful because it's still in that layer
+#       * Base fedora:latest is about 175MB
+#       * Tried ubi-minimal which is about 100MB but microdnf is missing many useful packages like fatrace and others 
+#       * gdb adds about 68MB but considered worth it for gdb and gcore
+#       * runc adds about 14MB but considered worth it for use with oc debug on a node
+#       * git adds about 41MB so instead we just use wget https://github.com/$GROUP/$REPO/archive/master.zip
+#       * perf adds about 40MB but considered worth it since it's commonly needed
+#       * perl adds about 150MB but is needed for FlameGraph
+#       * Then there is also a Java 11 JDK which is another few hundred MB
+#       * The oc command is about 120MB
+#       * Deleting files in the parent (e.g. /usr/lib64/python*/__pycache__) isn't useful because it's still in that layer
 #   * See available architectures for Fedora: podman manifest inspect docker.io/fedora:latest
 
 FROM --platform=$TARGETPLATFORM docker.io/fedora:latest
