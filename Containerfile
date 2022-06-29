@@ -18,13 +18,22 @@
 # For usage information, see https://www.ibm.com/support/pages/mustgather-performance-hang-or-high-cpu-issues-websphere-application-server-linux-containers
 #
 # Building:
+#   If re-building, building new images adds them to the manifest, so first delete all from the manifest:
+#     for i in $(podman manifest inspect localhost/containerdiag:latest | jq '.manifests[].digest' | tr '\n' ' ' | sed 's/"//g'); do podman manifest remove localhost/containerdiag:latest $i; done ; podman manifest inspect localhost/containerdiag:latest
 #   podman build --platform linux/amd64,linux/arm64,linux/ppc64le,linux/s390x --jobs=1 --manifest localhost/containerdiag:latest .
 #   podman manifest inspect localhost/containerdiag:latest
 #   podman login quay.io
-#   podman manifest push --all localhost/containerdiag:latest docker://quay.io/ibm/containerdiag:latest
-#   Check at https://quay.io/repository/ibm/containerdiag?tab=tags
+#   If testing is needed:
+#     The debug command only always pulls the latest for :latest, so to test under a different tag, make the tag unique, e.g.:
+#       podman manifest push --all localhost/containerdiag:latest docker://quay.io/ibm/containerdiag:test$(date +%Y%m%d)
+#     Then test with that image, e.g.:
+#       ./containerdiag.sh -i quay.io/ibm/containerdiag:test$(date +%Y%m%d) -d $DEPLOYMENT -n $NAMESPACE test.sh
+#     Delete the test tag from https://quay.io/repository/ibm/containerdiag?tab=tags
+#   Push to the latest tag:
+#     podman manifest push --all localhost/containerdiag:latest docker://quay.io/ibm/containerdiag:latest
 # 
 # Notes:
+#   * View tags at https://quay.io/repository/ibm/containerdiag?tab=tags
 #   * As of writing this note, this image is about 1GB
 #   * Base fedora:latest is about 175MB
 #   * Tried ubi-minimal which is about 100MB but microdnf is missing many useful packages like fatrace and others 
