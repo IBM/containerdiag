@@ -151,7 +151,7 @@ processPod() {
       fi
     fi
   else
-    printError "Could not find proc inforrmation for pod ${PODNAME} PID ${PODPID}"
+    printError "Could not find proc information for pod ${PODNAME} PID ${PODPID}"
   fi
 }
 

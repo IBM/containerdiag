@@ -151,4 +151,6 @@ RUN for SCRIPT in /opt/*.sh /opt/*.awk; do \
       ln -s ${SCRIPT} /usr/local/bin/; \
     done
 
+RUN printf "Built: %s\n%s\n" "$(date)" "$(uname -a)" > /opt/buildinfo.txt
+
 # Defer to the ENTRYPOINT/CMD of Fedora which is bash

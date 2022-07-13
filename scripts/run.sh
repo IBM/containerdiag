@@ -227,6 +227,7 @@ cat /host/etc/*elease* &> node/info/release.txt
 unshare -rR /host df -h &> node/info/df.txt
 unshare -rR /host systemctl list-units &> node/info/systemctlunits.txt
 unshare -rR /host systemd-cgls &> node/info/cgroups.txt
+cp /opt/buildinfo.txt node/info/ 2>/dev/null
 
 printInfo "All data gathering complete."
 
