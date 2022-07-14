@@ -78,23 +78,48 @@ printInfo "started with ${@} for ${PODNAMES}"
 
 processPod() {
   PODNAME="${1}"
-  [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod ${PODNAME} with ${@}"
   shift
-  mkdir -p pods/${PODNAME}
-  PODFS="$(podinfo.sh -r "${PODNAME}")"
+
+  [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod ${PODNAME} with ${@}"
+
+  PODFS="$(podinfo.sh -c -r "${PODNAME}")"
   [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod PODFS=${PODFS}"
+
+  OLDIFS="${IFS}"
+  # Subshell strips newline so add a random character to the end (/) and then strip it
+  IFS="$(printf '\n/')"
+  IFS="${IFS%/}"
+
+  for LINE in ${PODFS}; do
+    IFS="${OLDIFS}"
+    processContainer ${PODNAME} ${LINE} "${@}"
+  done
+}
+
+processContainer() {
+  PODNAME="${1}"
+  shift
+  PODFS="${1}"
+  shift
+  CONTAINER="${1}"
+  shift
+
+  printInfo "processing pod ${PODNAME}, container ${CONTAINER}"
+
+  [ "${VERBOSE}" -eq "1" ] && printVerbose "processContainer PODNAME=${PODNAME} PODFS=${PODFS} CONTAINER=${CONTAINER}"
+
   for ARG in "${@}"; do
-    [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod ARG=${ARG}"
+    [ "${VERBOSE}" -eq "1" ] && printVerbose "processContainer ARG=${ARG}"
 
     REALPATH="$(podfspath.sh "${PODFS}" "${ARG}")"
 
-    [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod REALPATH=${REALPATH}"
+    [ "${VERBOSE}" -eq "1" ] && printVerbose "processContainer REALPATH=${REALPATH}"
 
     if [ "${REALPATH}" != "" ]; then
       printVerbose "Removing ${REALPATH} for pod ${PODNAME}"
       rm -r ${REALPATH}
     else
-      printVerbose "Path ${ARG} for pod ${PODNAME} does not evaluate to a real path within ${PODFS}"
+      printVerbose "Path ${ARG} for pod ${PODNAME}, container ${CONTAINER} does not evaluate to a real path within ${PODFS}"
     fi
   done
 }

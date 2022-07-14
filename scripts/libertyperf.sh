@@ -100,7 +100,7 @@ for ARG in "${@}"; do
 done
 
 if [ "${SKIPSERVERDUMP}" -eq "0" ]; then
-  run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "linperf.sh -q ${SCRIPT_SPAN} ${JAVACORE_INTERVAL} ${TOP_INTERVAL} ${TOP_DASH_H_INTERVAL} ${VMSTAT_INTERVAL} $(podinfo.sh ${VERBOSE} -p ${@}) && DUMPS=\"\$(libertydump.sh ${VERBOSE} ${PODARGS})\"; podfscp.sh ${VERBOSE} -s ${PODARGS} /logs /config /output/javacore* \${DUMPS} ; podfsrm.sh ${VERBOSE} ${PODARGS} /output/javacore* \${DUMPS}"
+  run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "linperf.sh -q ${SCRIPT_SPAN} ${JAVACORE_INTERVAL} ${TOP_INTERVAL} ${TOP_DASH_H_INTERVAL} ${VMSTAT_INTERVAL} $(podinfo.sh ${VERBOSE} -j -p ${@}) && DUMPS=\"\$(libertydump.sh ${VERBOSE} ${PODARGS})\"; podfscp.sh ${VERBOSE} -s ${PODARGS} /logs /config /output/javacore* \${DUMPS} ; podfsrm.sh ${VERBOSE} ${PODARGS} /output/javacore* \${DUMPS}"
 else
-  run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "linperf.sh -q ${SCRIPT_SPAN} ${JAVACORE_INTERVAL} ${TOP_INTERVAL} ${TOP_DASH_H_INTERVAL} ${VMSTAT_INTERVAL} $(podinfo.sh ${VERBOSE} -p ${@}) && podfscp.sh ${VERBOSE} -s ${PODARGS} /logs /config /output/javacore* ; podfsrm.sh ${VERBOSE} ${PODARGS} /output/javacore*"
+  run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "linperf.sh -q ${SCRIPT_SPAN} ${JAVACORE_INTERVAL} ${TOP_INTERVAL} ${TOP_DASH_H_INTERVAL} ${VMSTAT_INTERVAL} $(podinfo.sh ${VERBOSE} -j -p ${@}) && podfscp.sh ${VERBOSE} -s ${PODARGS} /logs /config /output/javacore* ; podfsrm.sh ${VERBOSE} ${PODARGS} /output/javacore*"
 fi

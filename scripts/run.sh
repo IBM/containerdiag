@@ -32,6 +32,7 @@ EOF
   exit 2
 }
 
+VERSION="0.1.20220714"
 DESTDIR="/tmp"
 VERBOSE=0
 SKIPSTATS=0
@@ -113,7 +114,7 @@ echo "Writing to ${TARGETDIR}"
 pushd "${TARGETDIR}" || exit 1
 
 # Now we can finally start the execution
-printInfo "started on $(hostname)"
+printInfo "started on $(hostname) version ${VERSION}"
 
 # Note: use unshare instead of chroot because of https://github.com/opencontainers/runc/issues/3462#issuecomment-1155422205
 
@@ -228,6 +229,8 @@ unshare -rR /host df -h &> node/info/df.txt
 unshare -rR /host systemctl list-units &> node/info/systemctlunits.txt
 unshare -rR /host systemd-cgls &> node/info/cgroups.txt
 cp /opt/buildinfo.txt node/info/ 2>/dev/null
+pstree -pT &> node/info/pstree.txt
+chmod -R a+w node
 
 printInfo "All data gathering complete."
 

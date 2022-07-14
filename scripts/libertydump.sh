@@ -82,70 +82,86 @@ printInfo "started with ${PODNAMES}"
 processPod() {
   PODNAME="${1}"
   [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod ${PODNAME}"
-  PODPID="$(podinfo.sh -p "${PODNAME}")"
+  PODPID="$(podinfo.sh -c -p "${PODNAME}")"
   [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod PODPID=${PODPID}"
-  PODFS="$(podinfo.sh -r "${PODNAME}")"
-  [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod PODFS=${PODFS}"
 
-  if [ -e /proc/${PODPID} ]; then
+  OLDIFS="${IFS}"
+  # Subshell strips newline so add a random character to the end (/) and then strip it
+  IFS="$(printf '\n/')"
+  IFS="${IFS%/}"
+
+  for LINE in ${PODPID}; do
+    IFS="${OLDIFS}"
+    processContainer ${PODNAME} ${LINE} "${@}"
+  done
+}
+
+processContainer() {
+  PODNAME="${1}"
+  shift
+  PODPID="${1}"
+  shift
+  CONTAINER="${1}"
+  shift
+
+  printInfo "processing pod ${PODNAME}, container ${CONTAINER}, PID ${PODPID}"
+
+  [ "${VERBOSE}" -eq "1" ] && printVerbose "processContainer PODNAME=${PODNAME} PODPID=${PODPID} CONTAINER=${CONTAINER}"
+
+  if [ -e "/proc/${PODPID}" ]; then
     # Check if this is Liberty and get the server name
-    if grep -q ws-server.jar /proc/${PODPID}/cmdline ; then
+    if grep -q ws-server.jar "/proc/${PODPID}/cmdline" ; then
       LIBERTYSERVER="$(cat /proc/${PODPID}/cmdline | tr '\0' ' ' | awk '{print $NF;}')"
-      [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod LIBERTYSERVER=${LIBERTYSERVER}"
+      [ "${VERBOSE}" -eq "1" ] && printVerbose "processContainer LIBERTYSERVER=${LIBERTYSERVER}"
 
       PODEXE="$(ls -l /proc/${PODPID} | awk '/ exe -/ { print $NF; }')"
-      [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod PODEXE=${PODEXE}"
+      [ "${VERBOSE}" -eq "1" ] && printVerbose "processContainer PODEXE=${PODEXE}"
 
       if [ "${PODEXE}" != "" ]; then
-        # Use a sub-shell so that we don't pollute the current envars
+        cat "/proc/${PODPID}/environ" | tr '\0' '\n' > /tmp/envars.txt
+        while read LINE; do
+          [ "${VERBOSE}" -eq "1" ] && printVerbose "processContainer envar: ${LINE}"
 
-        (
-          cat /proc/${PODPID}/environ | tr '\0' '\n' > /tmp/envars.txt
-          while read LINE; do
-            [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod envar: ${LINE}"
+          case "${LINE}" in
+            WLP_USER_DIR*)
+              VAL="$(echo "${LINE}" | sed 's/.*=//g')"
+              LIBERTYROOT="$(dirname "${VAL}")"
+              export WLP_USER_DIR="${VAL}"
+              ;;
+            WLP_OUTPUT_DIR*)
+              VAL="$(echo "${LINE}" | sed 's/.*=//g')"
+              export WLP_OUTPUT_DIR="${VAL}"
+              ;;
+          esac
+        done </tmp/envars.txt
+        
+        [ "${VERBOSE}" -eq "1" ] && printVerbose "processContainer WLP_USER_DIR=${WLP_USER_DIR}"
+        [ "${VERBOSE}" -eq "1" ] && printVerbose "processContainer WLP_OUTPUT_DIR=${WLP_OUTPUT_DIR}"
 
-            case "${LINE}" in
-              WLP_USER_DIR*)
-                VAL="$(echo "${LINE}" | sed 's/.*=//g')"
-                LIBERTYROOT="$(dirname "${VAL}")"
-                export WLP_USER_DIR="${VAL}"
-                ;;
-              WLP_OUTPUT_DIR*)
-                VAL="$(echo "${LINE}" | sed 's/.*=//g')"
-                export WLP_OUTPUT_DIR="${VAL}"
-                ;;
-            esac
-          done </tmp/envars.txt
-          
-          [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod WLP_USER_DIR=${WLP_USER_DIR}"
-          [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod WLP_OUTPUT_DIR=${WLP_OUTPUT_DIR}"
+        POD_PID_OWNER="$(stat -c "%u" /proc/${PODPID}/)"
+        if [ "${POD_PID_OWNER}" != "" ]; then
 
-          POD_PID_OWNER="$(stat -c "%u" /proc/${PODPID}/)"
-          if [ "${POD_PID_OWNER}" != "" ]; then
+          [ "${VERBOSE}" -eq "1" ] && printVerbose "processContainer pod PID owner: ${POD_PID_OWNER}"
 
-            [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod pod PID owner: ${POD_PID_OWNER}"
+          OUTPUT="$(nsenter -a --follow-context --setuid ${POD_PID_OWNER} --target ${PODPID} "${PODEXE}" -jar "${LIBERTYROOT}/bin/tools/ws-server.jar" "${LIBERTYSERVER}" --dump)"
+          RC="${?}"
+          [ "${VERBOSE}" -eq "1" ] && printVerbose "processContainer server dump output with RC ${RC}: ${OUTPUT}"
 
-            OUTPUT="$(nsenter -a --follow-context --setuid ${POD_PID_OWNER} --target ${PODPID} "${PODEXE}" -jar "${LIBERTYROOT}/bin/tools/ws-server.jar" "${LIBERTYSERVER}" --dump)"
-            RC="${?}"
-            [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod server dump output with RC ${RC}: ${OUTPUT}"
+          DUMP="$(echo ${OUTPUT} | awk '/dump complete in/ { gsub(/\.$/, "", $NF); print $NF; }')"
+          [ "${VERBOSE}" -eq "1" ] && printVerbose "processContainer DUMP=${DUMP}"
 
-            DUMP="$(echo ${OUTPUT} | awk '/dump complete in/ { gsub(/\.$/, "", $NF); print $NF; }')"
-            [ "${VERBOSE}" -eq "1" ] && printVerbose "processPod DUMP=${DUMP}"
+          if [ "${DUMP}" != "" ]; then
+            printInfo "succeeded for ${PODNAME} with dump in ${DUMP}"
 
-            if [ "${DUMP}" != "" ]; then
-
-              printInfo "succeeded for ${PODNAME} with dump in ${DUMP}"
-
-              FOUND="$(((${FOUND}+1)))"
-              if [ "${FOUND}" -gt 0 ]; then
-                printf " "
-              fi
-              printf "%s" "${DUMP}"
+            FOUND="$(((${FOUND}+1)))"
+            if [ "${FOUND}" -gt 0 ]; then
+              printf " "
             fi
-          else
-            printWarning "Could not stat the owner ID of PID ${PODPID}"
+            printf "%s" "${DUMP}"
           fi
-        )
+        else
+          printWarning "Could not stat the owner ID of PID ${PODPID}"
+        fi
       else
         printError "Could not explore /proc/${PODPID}"
       fi

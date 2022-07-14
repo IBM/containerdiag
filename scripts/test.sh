@@ -69,4 +69,4 @@ for ARG in "${@}"; do
   PODARGS="${PODARGS} -p ${ARG}"
 done
 
-run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "echo 'Pod PIDs for ${@}:'; podinfo.sh ${VERBOSE} -p ${@}; echo 'Gathering basic pod logs and info'; podfscp.sh ${VERBOSE} -s ${PODARGS}"
+run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "echo 'Pod info for ${@}:'; podinfo.sh ${VERBOSE} -c -p ${@}; echo 'Gathering basic pod logs and info'; podfscp.sh ${VERBOSE} -s ${PODARGS}"
