@@ -19,6 +19,7 @@
 usage() {
   printf "Usage: %s [OPTIONS] [PODNAME]...\n" "$(basename "${0}")"
   cat <<"EOF"
+             -c: Path to javacores (default /output/javacore*)
              -d: DELAY (for run.sh)
              -n: No download necessary (for run.sh)
              -v: verbose output to stderr
@@ -31,10 +32,14 @@ DELAY=""
 NODOWNLOAD=""
 SKIPSTATS=""
 VERBOSE=""
+JAVACORE_PATH="/output/javacore*"
 
 OPTIND=1
-while getopts "d:nvz?" opt; do
+while getopts "c:d:nvz?" opt; do
   case "$opt" in
+    c)
+      JAVACORE_PATH="${OPTARG}"
+      ;;
     d)
       DELAY="-d ${OPTARG}"
       ;;
@@ -69,4 +74,4 @@ for ARG in "${@}"; do
   PODARGS="${PODARGS} -p ${ARG}"
 done
 
-run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "kill -3 $(podinfo.sh ${VERBOSE} -j -p ${@}); podfscp.sh ${VERBOSE} -s ${PODARGS} /output/javacore* ; podfsrm.sh ${VERBOSE} ${PODARGS} /output/javacore*"
+run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "kill -3 $(podinfo.sh ${VERBOSE} -j -p ${@}); sleep 2; podfscp.sh ${VERBOSE} -s ${PODARGS} ${JAVACORE_PATH} ; podfsrm.sh ${VERBOSE} ${PODARGS} ${JAVACORE_PATH}"

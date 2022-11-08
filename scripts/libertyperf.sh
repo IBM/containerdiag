@@ -19,6 +19,7 @@
 usage() {
   printf "Usage: %s [OPTIONS] [PODNAME]...\n" "$(basename "${0}")"
   cat <<"EOF"
+             -c: Path to javacores (default /output/javacore*)
              -d: DELAY (for run.sh)
              -j: JAVACORE_INTERVAL for linperf.sh
              -m: VMSTAT_INTERVAL for linperf.sh
@@ -43,10 +44,14 @@ SCRIPT_SPAN=""
 TOP_INTERVAL=""
 TOP_DASH_H_INTERVAL=""
 VMSTAT_INTERVAL=""
+JAVACORE_PATH="/output/javacore*"
 
 OPTIND=1
-while getopts "d:hj:m:nps:t:u:vz?" opt; do
+while getopts "c:d:hj:m:nps:t:u:vz?" opt; do
   case "$opt" in
+    c)
+      JAVACORE_PATH="${OPTARG}"
+      ;;
     d)
       DELAY="-d ${OPTARG}"
       ;;
@@ -100,7 +105,7 @@ for ARG in "${@}"; do
 done
 
 if [ "${SKIPSERVERDUMP}" -eq "0" ]; then
-  run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "linperf.sh -q ${SCRIPT_SPAN} ${JAVACORE_INTERVAL} ${TOP_INTERVAL} ${TOP_DASH_H_INTERVAL} ${VMSTAT_INTERVAL} $(podinfo.sh ${VERBOSE} -j -p ${@}) && DUMPS=\"\$(libertydump.sh ${VERBOSE} ${PODARGS})\"; podfscp.sh ${VERBOSE} -s ${PODARGS} /logs /config /output/javacore* \${DUMPS} ; podfsrm.sh ${VERBOSE} ${PODARGS} /output/javacore* \${DUMPS}"
+  run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "linperf.sh -q ${SCRIPT_SPAN} ${JAVACORE_INTERVAL} ${TOP_INTERVAL} ${TOP_DASH_H_INTERVAL} ${VMSTAT_INTERVAL} $(podinfo.sh ${VERBOSE} -j -p ${@}) && DUMPS=\"\$(libertydump.sh ${VERBOSE} ${PODARGS})\"; podfscp.sh ${VERBOSE} -s ${PODARGS} /logs /config ${JAVACORE_PATH} \${DUMPS} ; podfsrm.sh ${VERBOSE} ${PODARGS} ${JAVACORE_PATH} \${DUMPS}"
 else
-  run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "linperf.sh -q ${SCRIPT_SPAN} ${JAVACORE_INTERVAL} ${TOP_INTERVAL} ${TOP_DASH_H_INTERVAL} ${VMSTAT_INTERVAL} $(podinfo.sh ${VERBOSE} -j -p ${@}) && podfscp.sh ${VERBOSE} -s ${PODARGS} /logs /config /output/javacore* ; podfsrm.sh ${VERBOSE} ${PODARGS} /output/javacore*"
+  run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "linperf.sh -q ${SCRIPT_SPAN} ${JAVACORE_INTERVAL} ${TOP_INTERVAL} ${TOP_DASH_H_INTERVAL} ${VMSTAT_INTERVAL} $(podinfo.sh ${VERBOSE} -j -p ${@}) && podfscp.sh ${VERBOSE} -s ${PODARGS} /logs /config ${JAVACORE_PATH} ; podfsrm.sh ${VERBOSE} ${PODARGS} ${JAVACORE_PATH}"
 fi
