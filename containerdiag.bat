@@ -69,16 +69,17 @@ goto :start
   set "TARGETDEPLOYMENT="
   set "TARGETPOD="
 
-set "I=0"
-for %%x in (%*) do (
-   set /A "I+=1"
-   set "ARGS[!I!]=%%~x"
-)
+set "ARGC=0"
+:getArgsCount
+  set /a "ARGC+=1"
+  set "ARGS[!ARGC!]=%1"
+  shift
+  if defined ARGS[!ARGC!] goto getArgsCount
 
 set /a "REMAININGINDEX=1"
 
 set "KEEPGOING=1"
-for /L %%J in (1,1,!I!) do (
+for /L %%J in (1,1,!ARGC!) do (
   if "!KEEPGOING!" == "1" (
     if /i "!ARGS[%%J]!" == "/?" goto :usage
     if /i "!ARGS[%%J]!" == "-?" goto :usage
@@ -124,7 +125,7 @@ if ERRORLEVEL 1 (
 )
 
 set "REMAININGARGS="
-for /L %%J in (!REMAININGINDEX!,1,!I!) do (
+for /L %%J in (!REMAININGINDEX!,1,!ARGC!) do (
   set "REMAININGARGS=!REMAININGARGS! !ARGS[%%J]!"
 )
 
