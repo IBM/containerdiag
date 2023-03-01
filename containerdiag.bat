@@ -21,7 +21,7 @@
 
 SETLOCAL ENABLEDELAYEDEXPANSION
 
-set "VERSION=0.1.20230227"
+set "VERSION=0.1.20230301"
 set "SCRIPTNAME=%~nx0"
 
 goto :start
@@ -148,20 +148,20 @@ if "!NAMESPACE!" == "" (
 )
 
 if not "!TARGETDEPLOYMENT!" == "" (
-  call :printInfo Querying available replicas for deployment !TARGETDEPLOYMENT! in namespace !NAMESPACE!
+  call :printInfo Querying replicas for deployment !TARGETDEPLOYMENT! in namespace !NAMESPACE!
 
-  for /F "tokens=* USEBACKQ" %%x in (`!CTL! get deployment !TARGETDEPLOYMENT! "--namespace=!NAMESPACE!" "--output=jsonpath={.status.availableReplicas}"`) do set "AVAILABLEREPLICAS=%%x"
-  if "!AVAILABLEREPLICAS!" == "" (
+  for /F "tokens=* USEBACKQ" %%x in (`!CTL! get deployment !TARGETDEPLOYMENT! "--namespace=!NAMESPACE!" "--output=jsonpath={.status.replicas}"`) do set "REPLICAS=%%x"
+  if "!REPLICAS!" == "" (
     call :printInfo Error getting deployment information. Ensure you specify the right namespace with -n NAMESPACE
     exit /B 1
   )
 
-  if "!AVAILABLEREPLICAS!" == "0" (
-    call :printInfo There are 0 available replicas for this deployment
+  if "!REPLICAS!" == "0" (
+    call :printInfo There are 0 replicas for this deployment
     exit /B 1
   )
 
-  call :printInfo There are !AVAILABLEREPLICAS! available replicas
+  call :printInfo There are !REPLICAS! replicas
 
   call :printInfo Querying deployment selector label
 

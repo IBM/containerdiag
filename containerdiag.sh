@@ -35,7 +35,7 @@ EOF
   exit 22
 }
 
-VERSION="0.1.20230227"
+VERSION="0.1.20230301"
 NAMESPACE=""
 VERBOSE=0
 APPEND=1
@@ -143,10 +143,10 @@ processPod() {
 }
 
 if [ "${TARGETDEPLOYMENT}" != "" ]; then
-  printInfo "Querying available replicas for deployment ${TARGETDEPLOYMENT} in namespace ${NAMESPACE}"
+  printInfo "Querying replicas for deployment ${TARGETDEPLOYMENT} in namespace ${NAMESPACE}"
 
   # Let's check if the deployment has any active pods
-  AVAILABLEREPLICAS="$("${CTL}" get deployment "${TARGETDEPLOYMENT}" "--namespace=${NAMESPACE}" "--output=jsonpath={.status.availableReplicas}")"
+  REPLICAS="$("${CTL}" get deployment "${TARGETDEPLOYMENT}" "--namespace=${NAMESPACE}" "--output=jsonpath={.status.replicas}")"
   RC="${?}"
 
   if [ ${RC} -ne 0 ]; then
@@ -154,17 +154,17 @@ if [ "${TARGETDEPLOYMENT}" != "" ]; then
     exit ${RC}
   fi
 
-  if [ "${AVAILABLEREPLICAS}" = "" ]; then
+  if [ "${REPLICAS}" = "" ]; then
     printInfo "Error getting deployment information. Ensure you specify the right namespace with -n NAMESPACE"
     exit 1
   fi
 
-  if [ "${AVAILABLEREPLICAS}" -eq 0 ]; then
-    printInfo "Error: There are 0 available replicas for this deployment"
+  if [ "${REPLICAS}" -eq 0 ]; then
+    printInfo "Error: There are 0 replicas for this deployment"
     exit 1
   fi
 
-  printInfo "There are ${AVAILABLEREPLICAS} available replicas"
+  printInfo "There are ${REPLICAS} replicas"
 
   printInfo "Querying deployment selector label"
 
