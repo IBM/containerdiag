@@ -1,6 +1,6 @@
 #!/bin/sh
 # /*******************************************************************************
-#  * (c) Copyright IBM Corporation 2022.
+#  * (c) Copyright IBM Corporation 2023.
 #  *
 #  * Licensed under the Apache License, Version 2.0 (the "License");
 #  * you may not use this file except in compliance with the License.
@@ -32,6 +32,11 @@ usage() {
 EOF
   exit 2
 }
+
+# We periodically observe a strange issue where the first few seconds
+# of output are not sent to the console, so sleep to try to avoid this.
+sleep 5
+echo "Started $(basename "${0}")"
 
 DELAY=""
 NODOWNLOAD=""

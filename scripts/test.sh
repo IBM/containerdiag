@@ -1,6 +1,6 @@
 #!/bin/sh
 # /*******************************************************************************
-#  * (c) Copyright IBM Corporation 2022.
+#  * (c) Copyright IBM Corporation 2023.
 #  *
 #  * Licensed under the Apache License, Version 2.0 (the "License");
 #  * you may not use this file except in compliance with the License.
@@ -31,6 +31,11 @@ DELAY=""
 NODOWNLOAD=""
 VERBOSE=""
 SKIPSTATS=""
+
+# We periodically observe a strange issue where the first few seconds
+# of output are not sent to the console, so sleep to try to avoid this.
+sleep 5
+echo "Started $(basename "${0}")"
 
 OPTIND=1
 while getopts "d:hnvz?" opt; do
@@ -69,4 +74,6 @@ for ARG in "${@}"; do
   PODARGS="${PODARGS} -p ${ARG}"
 done
 
-run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "echo 'Pod info for ${@}:'; podinfo.sh ${VERBOSE} -c -p ${@}; echo 'Gathering basic pod logs and info'; podfscp.sh ${VERBOSE} -s ${PODARGS}"
+run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "echo 'Pod info for ${@}:'; podinfo.sh ${VERBOSE} -c -p ${@}; echo 'Gathering basic pod logs and info'; podfscp.sh ${VERBOSE} -s ${PODARGS} /etc/hostname"
+
+echo "Finished test.sh"

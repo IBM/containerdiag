@@ -114,7 +114,7 @@ processContainer() {
       LIBERTYSERVER="$(cat /proc/${PODPID}/cmdline | tr '\0' ' ' | awk '{print $NF;}')"
       [ "${VERBOSE}" -eq "1" ] && printVerbose "processContainer LIBERTYSERVER=${LIBERTYSERVER}"
 
-      PODEXE="$(ls -l /proc/${PODPID} | awk '/ exe -/ { print $NF; }')"
+      PODEXE="$(cat /proc/${PODPID}/cmdline | tr '\0' '\n' | awk 'NR==1')"
       [ "${VERBOSE}" -eq "1" ] && printVerbose "processContainer PODEXE=${PODEXE}"
 
       if [ "${PODEXE}" != "" ]; then

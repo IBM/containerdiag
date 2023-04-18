@@ -1,0 +1,386 @@
+chroot /host ctr --namespace k8s.io containers info $ID
+
+{
+    "ID": "2fe433f3264e7cc2ca8bd223d8f69371ad74b7ab17f0fa318d828d0623f163e7",
+    "Labels": {
+        "BuildLabel": "cl230220230222-1257",
+        "ProductID": "fbf6a96d49214c0abc6a3bc5da6e48cd",
+        "ProductName": "WebSphere Application Server Liberty",
+        "ProductVersion": "23.0.0.2",
+        "architecture": "x86_64",
+        "build-date": "2023-03-22T10:48:33",
+        "com.ibm.websphere.liberty.image.tag": "full-java8-ibmjava-ubi",
+        "com.redhat.component": "ubi8-container",
+        "com.redhat.license_terms": "https://www.redhat.com/en/about/red-hat-end-user-license-agreements#UBI",
+        "description": "libertydiag is a Jakarta EE 9 and MicroProfile 5 web application for simulating diagnostic situations",
+        "distribution-scope": "public",
+        "io.buildah.version": "1.29.0",
+        "io.cri-containerd.kind": "container",
+        "io.k8s.description": "The Universal Base Image is designed and engineered to be the base layer for all of your containerized applications, middleware and utilities. This base image is freely redistributable, but Red Hat only supports Red Hat technologies through subscriptions for Red Hat products. This image is maintained by Red Hat and updated regularly.",
+        "io.k8s.display-name": "Red Hat Universal Base Image 8",
+        "io.kubernetes.container.name": "libertydiag",
+        "io.kubernetes.pod.name": "libertydiag-745db5c657-ghd9h",
+        "io.kubernetes.pod.namespace": "default",
+        "io.kubernetes.pod.uid": "58126ae1-ca08-4134-bd1d-33b576da4671",
+        "io.openshift.tags": "base rhel8",
+        "liberty.image.tag": "full-java8-ibmjava-ubi",
+        "license": "Apache-2.0",
+        "maintainer": "kevin.grigorenko@us.ibm.com,brenthdaniel@gmail.com",
+        "name": "libertydiag",
+        "org.opencontainers.image.authors": "kevin.grigorenko@us.ibm.com,brenthdaniel@gmail.com",
+        "org.opencontainers.image.description": "libertydiag is a Jakarta EE 9 and MicroProfile 5 web application for simulating diagnostic situations",
+        "org.opencontainers.image.documentation": "https://www.ibm.com/support/knowledgecenter/SSAW57_liberty/com.ibm.websphere.wlp.nd.multiplatform.doc/ae/cwlp_about.html",
+        "org.opencontainers.image.licenses": "Apache-2.0",
+        "org.opencontainers.image.revision": "1702caaf730d90ff5cf3944f3f4a39d21de70a5a",
+        "org.opencontainers.image.source": "https://github.com/IBM/libertydiag",
+        "org.opencontainers.image.title": "libertydiag",
+        "org.opencontainers.image.url": "https://github.com/IBM/libertydiag",
+        "org.opencontainers.image.version": "0.1.20230411",
+        "release": "8",
+        "run": "docker run --rm -ti \u003cimage_name:tag\u003e /bin/bash",
+        "summary": "Liberty diagnostic web application",
+        "url": "https://access.redhat.com/containers/#/registry.access.redhat.com/ubi8/images/8.7-1090.1679482075",
+        "vcs-ref": "a995512a05037e3b60bbb1bf9fa6e394063131c3",
+        "vcs-type": "git",
+        "version": "0.1.20230411-1702caaf730d90ff5cf3944f3f4a39d21de70a5a"
+    },
+    "Image": "quay.io/ibm/libertydiag:latest",
+    "Runtime": {
+        "Name": "io.containerd.runc.v2",
+        "Options": {
+            "type_url": "containerd.runc.v1.Options",
+            "value": "SAE="
+        }
+    },
+    "SnapshotKey": "2fe433f3264e7cc2ca8bd223d8f69371ad74b7ab17f0fa318d828d0623f163e7",
+    "Snapshotter": "overlayfs",
+    "CreatedAt": "2023-04-18T16:14:03.567755459Z",
+    "UpdatedAt": "2023-04-18T16:14:03.567755459Z",
+    "Extensions": {
+        "io.cri-containerd.container.metadata": {
+            "type_url": "github.com/containerd/cri/pkg/store/container/Metadata",
+            "value": "eyJWZXJzaW9uIjoidjEiLCJNZXRhZGF0YSI6eyJJRCI6IjJmZTQzM2YzMjY0ZTdjYzJjYThiZDIyM2Q4ZjY5MzcxYWQ3NGI3YWIxN2YwZmEzMThkODI4ZDA2MjNmMTYzZTciLCJOYW1lIjoibGliZXJ0eWRpYWdfbGliZXJ0eWRpYWctNzQ1ZGI1YzY1Ny1naGQ5aF9kZWZhdWx0XzU4MTI2YWUxLWNhMDgtNDEzNC1iZDFkLTMzYjU3NmRhNDY3MV8wIiwiU2FuZGJveElEIjoiNmQ5OWJiZTBmM2UyMjMyYjhjMTZiYjdlYTkzODgyMWRiODFkMGEwYWRlM2U0ZGYzZTc4YzA1NTJjNjAxMzI0OSIsIkNvbmZpZyI6eyJtZXRhZGF0YSI6eyJuYW1lIjoibGliZXJ0eWRpYWcifSwiaW1hZ2UiOnsiaW1hZ2UiOiJzaGEyNTY6MGZkODRiNmUwMWNkOWUxODZlNmNmN2M4ZDMxZWI2YjBhMGVkY2JmZDg1YmIxMjMyNzM0ZDk0YmRmMWUxMWIyNyJ9LCJlbnZzIjpbeyJrZXkiOiJMSUJFUlRZRElBR19TRVJWSUNFX0hPU1QiLCJ2YWx1ZSI6IjEwLjEwMC4xNS45MCJ9LHsia2V5IjoiTElCRVJUWURJQUdfU0VSVklDRV9QT1JUIiwidmFsdWUiOiI4MCJ9LHsia2V5IjoiTElCRVJUWURJQUdfUE9SVCIsInZhbHVlIjoidGNwOi8vMTAuMTAwLjE1LjkwOjgwIn0seyJrZXkiOiJLVUJFUk5FVEVTX1BPUlRfNDQzX1RDUF9QT1JUIiwidmFsdWUiOiI0NDMifSx7ImtleSI6IktVQkVSTkVURVNfUE9SVF80NDNfVENQX0FERFIiLCJ2YWx1ZSI6IjEwLjEwMC4wLjEifSx7ImtleSI6IkxJQkVSVFlESUFHX1BPUlRfODBfVENQX1BST1RPIiwidmFsdWUiOiJ0Y3AifSx7ImtleSI6IkxJQkVSVFlESUFHX1BPUlRfODBfVENQX1BPUlQiLCJ2YWx1ZSI6IjgwIn0seyJrZXkiOiJMSUJFUlRZRElBR19QT1JUXzgwX1RDUF9BRERSIiwidmFsdWUiOiIxMC4xMDAuMTUuOTAifSx7ImtleSI6IktVQkVSTkVURVNfUE9SVF80NDNfVENQX1BST1RPIiwidmFsdWUiOiJ0Y3AifSx7ImtleSI6IkxJQkVSVFlESUFHX1BPUlRfODBfVENQIiwidmFsdWUiOiJ0Y3A6Ly8xMC4xMDAuMTUuOTA6ODAifSx7ImtleSI6IktVQkVSTkVURVNfU0VSVklDRV9IT1NUIiwidmFsdWUiOiIxMC4xMDAuMC4xIn0seyJrZXkiOiJLVUJFUk5FVEVTX1NFUlZJQ0VfUE9SVCIsInZhbHVlIjoiNDQzIn0seyJrZXkiOiJLVUJFUk5FVEVTX1NFUlZJQ0VfUE9SVF9IVFRQUyIsInZhbHVlIjoiNDQzIn0seyJrZXkiOiJLVUJFUk5FVEVTX1BPUlQiLCJ2YWx1ZSI6InRjcDovLzEwLjEwMC4wLjE6NDQzIn0seyJrZXkiOiJLVUJFUk5FVEVTX1BPUlRfNDQzX1RDUCIsInZhbHVlIjoidGNwOi8vMTAuMTAwLjAuMTo0NDMifV0sIm1vdW50cyI6W3siY29udGFpbmVyX3BhdGgiOiIvdmFyL3J1bi9zZWNyZXRzL2t1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQiLCJob3N0X3BhdGgiOiIvdmFyL2xpYi9rdWJlbGV0L3BvZHMvNTgxMjZhZTEtY2EwOC00MTM0LWJkMWQtMzNiNTc2ZGE0NjcxL3ZvbHVtZXMva3ViZXJuZXRlcy5pb35wcm9qZWN0ZWQva3ViZS1hcGktYWNjZXNzLTI5a2J0IiwicmVhZG9ubHkiOnRydWV9LHsiY29udGFpbmVyX3BhdGgiOiIvZXRjL2hvc3RzIiwiaG9zdF9wYXRoIjoiL3Zhci9saWIva3ViZWxldC9wb2RzLzU4MTI2YWUxLWNhMDgtNDEzNC1iZDFkLTMzYjU3NmRhNDY3MS9ldGMtaG9zdHMifSx7ImNvbnRhaW5lcl9wYXRoIjoiL2Rldi90ZXJtaW5hdGlvbi1sb2ciLCJob3N0X3BhdGgiOiIvdmFyL2xpYi9rdWJlbGV0L3BvZHMvNTgxMjZhZTEtY2EwOC00MTM0LWJkMWQtMzNiNTc2ZGE0NjcxL2NvbnRhaW5lcnMvbGliZXJ0eWRpYWcvNTA4NTAwZTkifV0sImxhYmVscyI6eyJpby5rdWJlcm5ldGVzLmNvbnRhaW5lci5uYW1lIjoibGliZXJ0eWRpYWciLCJpby5rdWJlcm5ldGVzLnBvZC5uYW1lIjoibGliZXJ0eWRpYWctNzQ1ZGI1YzY1Ny1naGQ5aCIsImlvLmt1YmVybmV0ZXMucG9kLm5hbWVzcGFjZSI6ImRlZmF1bHQiLCJpby5rdWJlcm5ldGVzLnBvZC51aWQiOiI1ODEyNmFlMS1jYTA4LTQxMzQtYmQxZC0zM2I1NzZkYTQ2NzEifSwiYW5ub3RhdGlvbnMiOnsiaW8ua3ViZXJuZXRlcy5jb250YWluZXIuaGFzaCI6IjYyZjI1OThhIiwiaW8ua3ViZXJuZXRlcy5jb250YWluZXIucmVzdGFydENvdW50IjoiMCIsImlvLmt1YmVybmV0ZXMuY29udGFpbmVyLnRlcm1pbmF0aW9uTWVzc2FnZVBhdGgiOiIvZGV2L3Rlcm1pbmF0aW9uLWxvZyIsImlvLmt1YmVybmV0ZXMuY29udGFpbmVyLnRlcm1pbmF0aW9uTWVzc2FnZVBvbGljeSI6IkZpbGUiLCJpby5rdWJlcm5ldGVzLnBvZC50ZXJtaW5hdGlvbkdyYWNlUGVyaW9kIjoiMzAifSwibG9nX3BhdGgiOiJsaWJlcnR5ZGlhZy8wLmxvZyIsImxpbnV4Ijp7InJlc291cmNlcyI6eyJjcHVfcGVyaW9kIjoxMDAwMDAsImNwdV9zaGFyZXMiOjIsIm9vbV9zY29yZV9hZGoiOjEwMDAsImh1Z2VwYWdlX2xpbWl0cyI6W3sicGFnZV9zaXplIjoiMk1CIn0seyJwYWdlX3NpemUiOiIxR0IifV19LCJzZWN1cml0eV9jb250ZXh0Ijp7Im5hbWVzcGFjZV9vcHRpb25zIjp7InBpZCI6MX0sInJ1bl9hc191c2VyIjp7InZhbHVlIjoxMDAxfSwibWFza2VkX3BhdGhzIjpbIi9wcm9jL2FjcGkiLCIvcHJvYy9rY29yZSIsIi9wcm9jL2tleXMiLCIvcHJvYy9sYXRlbmN5X3N0YXRzIiwiL3Byb2MvdGltZXJfbGlzdCIsIi9wcm9jL3RpbWVyX3N0YXRzIiwiL3Byb2Mvc2NoZWRfZGVidWciLCIvcHJvYy9zY3NpIiwiL3N5cy9maXJtd2FyZSJdLCJyZWFkb25seV9wYXRocyI6WyIvcHJvYy9hc291bmQiLCIvcHJvYy9idXMiLCIvcHJvYy9mcyIsIi9wcm9jL2lycSIsIi9wcm9jL3N5cyIsIi9wcm9jL3N5c3JxLXRyaWdnZXIiXSwic2VjY29tcCI6eyJwcm9maWxlX3R5cGUiOjF9fX19LCJJbWFnZVJlZiI6InNoYTI1NjowZmQ4NGI2ZTAxY2Q5ZTE4NmU2Y2Y3YzhkMzFlYjZiMGEwZWRjYmZkODViYjEyMzI3MzRkOTRiZGYxZTExYjI3IiwiTG9nUGF0aCI6Ii92YXIvbG9nL3BvZHMvZGVmYXVsdF9saWJlcnR5ZGlhZy03NDVkYjVjNjU3LWdoZDloXzU4MTI2YWUxLWNhMDgtNDEzNC1iZDFkLTMzYjU3NmRhNDY3MS9saWJlcnR5ZGlhZy8wLmxvZyIsIlN0b3BTaWduYWwiOiIiLCJQcm9jZXNzTGFiZWwiOiIifX0="
+        }
+    },
+    "Spec": {
+        "ociVersion": "1.0.2-dev",
+        "process": {
+            "user": {
+                "uid": 1001,
+                "gid": 0,
+                "additionalGids": [
+                    0
+                ]
+            },
+            "args": [
+                "/opt/ibm/helpers/runtime/docker-server.sh",
+                "/opt/ibm/wlp/bin/server",
+                "run",
+                "defaultServer"
+            ],
+            "env": [
+                "PATH=/opt/ibm/java/jre/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/ibm/wlp/bin:/opt/ibm/helpers/build",
+                "HOSTNAME=libertydiag-745db5c657-ghd9h",
+                "container=oci",
+                "JAVA_VERSION=8.0.7.20",
+                "JAVA_HOME=/opt/ibm/java/jre",
+                "IBM_JAVA_OPTIONS=-Xshareclasses:name=liberty,readonly,nonfatal,cacheDir=/output/.classCache/ -Dosgi.checkConfiguration=false -XX:+UseContainerSupport",
+                "LIBERTY_VERSION=23.0.0_2",
+                "LOG_DIR=/logs",
+                "WLP_OUTPUT_DIR=/opt/ibm/wlp/output",
+                "OPENJ9_SCC=true",
+                "RANDFILE=/tmp/.rnd",
+                "WLP_LOGGING_CONSOLE_FORMAT=JSON",
+                "WLP_LOGGING_CONSOLE_LOGLEVEL=info",
+                "WLP_LOGGING_CONSOLE_SOURCE=message,trace,accessLog,ffdc,audit",
+                "LIBERTYDIAG_SERVICE_HOST=10.100.15.90",
+                "LIBERTYDIAG_SERVICE_PORT=80",
+                "LIBERTYDIAG_PORT=tcp://10.100.15.90:80",
+                "KUBERNETES_PORT_443_TCP_PORT=443",
+                "KUBERNETES_PORT_443_TCP_ADDR=10.100.0.1",
+                "LIBERTYDIAG_PORT_80_TCP_PROTO=tcp",
+                "LIBERTYDIAG_PORT_80_TCP_PORT=80",
+                "LIBERTYDIAG_PORT_80_TCP_ADDR=10.100.15.90",
+                "KUBERNETES_PORT_443_TCP_PROTO=tcp",
+                "LIBERTYDIAG_PORT_80_TCP=tcp://10.100.15.90:80",
+                "KUBERNETES_SERVICE_HOST=10.100.0.1",
+                "KUBERNETES_SERVICE_PORT=443",
+                "KUBERNETES_SERVICE_PORT_HTTPS=443",
+                "KUBERNETES_PORT=tcp://10.100.0.1:443",
+                "KUBERNETES_PORT_443_TCP=tcp://10.100.0.1:443"
+            ],
+            "cwd": "/",
+            "capabilities": {
+                "bounding": [
+                    "CAP_CHOWN",
+                    "CAP_DAC_OVERRIDE",
+                    "CAP_FSETID",
+                    "CAP_FOWNER",
+                    "CAP_MKNOD",
+                    "CAP_NET_RAW",
+                    "CAP_SETGID",
+                    "CAP_SETUID",
+                    "CAP_SETFCAP",
+                    "CAP_SETPCAP",
+                    "CAP_NET_BIND_SERVICE",
+                    "CAP_SYS_CHROOT",
+                    "CAP_KILL",
+                    "CAP_AUDIT_WRITE"
+                ],
+                "effective": [
+                    "CAP_CHOWN",
+                    "CAP_DAC_OVERRIDE",
+                    "CAP_FSETID",
+                    "CAP_FOWNER",
+                    "CAP_MKNOD",
+                    "CAP_NET_RAW",
+                    "CAP_SETGID",
+                    "CAP_SETUID",
+                    "CAP_SETFCAP",
+                    "CAP_SETPCAP",
+                    "CAP_NET_BIND_SERVICE",
+                    "CAP_SYS_CHROOT",
+                    "CAP_KILL",
+                    "CAP_AUDIT_WRITE"
+                ],
+                "permitted": [
+                    "CAP_CHOWN",
+                    "CAP_DAC_OVERRIDE",
+                    "CAP_FSETID",
+                    "CAP_FOWNER",
+                    "CAP_MKNOD",
+                    "CAP_NET_RAW",
+                    "CAP_SETGID",
+                    "CAP_SETUID",
+                    "CAP_SETFCAP",
+                    "CAP_SETPCAP",
+                    "CAP_NET_BIND_SERVICE",
+                    "CAP_SYS_CHROOT",
+                    "CAP_KILL",
+                    "CAP_AUDIT_WRITE"
+                ]
+            },
+            "oomScoreAdj": 1000
+        },
+        "root": {
+            "path": "rootfs"
+        },
+        "mounts": [
+            {
+                "destination": "/proc",
+                "type": "proc",
+                "source": "proc",
+                "options": [
+                    "nosuid",
+                    "noexec",
+                    "nodev"
+                ]
+            },
+            {
+                "destination": "/dev",
+                "type": "tmpfs",
+                "source": "tmpfs",
+                "options": [
+                    "nosuid",
+                    "strictatime",
+                    "mode=755",
+                    "size=65536k"
+                ]
+            },
+            {
+                "destination": "/dev/pts",
+                "type": "devpts",
+                "source": "devpts",
+                "options": [
+                    "nosuid",
+                    "noexec",
+                    "newinstance",
+                    "ptmxmode=0666",
+                    "mode=0620",
+                    "gid=5"
+                ]
+            },
+            {
+                "destination": "/dev/mqueue",
+                "type": "mqueue",
+                "source": "mqueue",
+                "options": [
+                    "nosuid",
+                    "noexec",
+                    "nodev"
+                ]
+            },
+            {
+                "destination": "/sys",
+                "type": "sysfs",
+                "source": "sysfs",
+                "options": [
+                    "nosuid",
+                    "noexec",
+                    "nodev",
+                    "ro"
+                ]
+            },
+            {
+                "destination": "/sys/fs/cgroup",
+                "type": "cgroup",
+                "source": "cgroup",
+                "options": [
+                    "nosuid",
+                    "noexec",
+                    "nodev",
+                    "relatime",
+                    "ro"
+                ]
+            },
+            {
+                "destination": "/etc/hosts",
+                "type": "bind",
+                "source": "/var/lib/kubelet/pods/58126ae1-ca08-4134-bd1d-33b576da4671/etc-hosts",
+                "options": [
+                    "rbind",
+                    "rprivate",
+                    "rw"
+                ]
+            },
+            {
+                "destination": "/dev/termination-log",
+                "type": "bind",
+                "source": "/var/lib/kubelet/pods/58126ae1-ca08-4134-bd1d-33b576da4671/containers/libertydiag/508500e9",
+                "options": [
+                    "rbind",
+                    "rprivate",
+                    "rw"
+                ]
+            },
+            {
+                "destination": "/etc/hostname",
+                "type": "bind",
+                "source": "/var/lib/containerd/io.containerd.grpc.v1.cri/sandboxes/6d99bbe0f3e2232b8c16bb7ea938821db81d0a0ade3e4df3e78c0552c6013249/hostname",
+                "options": [
+                    "rbind",
+                    "rprivate",
+                    "rw"
+                ]
+            },
+            {
+                "destination": "/etc/resolv.conf",
+                "type": "bind",
+                "source": "/var/lib/containerd/io.containerd.grpc.v1.cri/sandboxes/6d99bbe0f3e2232b8c16bb7ea938821db81d0a0ade3e4df3e78c0552c6013249/resolv.conf",
+                "options": [
+                    "rbind",
+                    "rprivate",
+                    "rw"
+                ]
+            },
+            {
+                "destination": "/dev/shm",
+                "type": "bind",
+                "source": "/run/containerd/io.containerd.grpc.v1.cri/sandboxes/6d99bbe0f3e2232b8c16bb7ea938821db81d0a0ade3e4df3e78c0552c6013249/shm",
+                "options": [
+                    "rbind",
+                    "rprivate",
+                    "rw"
+                ]
+            },
+            {
+                "destination": "/var/run/secrets/kubernetes.io/serviceaccount",
+                "type": "bind",
+                "source": "/var/lib/kubelet/pods/58126ae1-ca08-4134-bd1d-33b576da4671/volumes/kubernetes.io~projected/kube-api-access-29kbt",
+                "options": [
+                    "rbind",
+                    "rprivate",
+                    "ro"
+                ]
+            }
+        ],
+        "annotations": {
+            "io.kubernetes.cri.container-name": "libertydiag",
+            "io.kubernetes.cri.container-type": "container",
+            "io.kubernetes.cri.image-name": "quay.io/ibm/libertydiag:latest",
+            "io.kubernetes.cri.sandbox-id": "6d99bbe0f3e2232b8c16bb7ea938821db81d0a0ade3e4df3e78c0552c6013249",
+            "io.kubernetes.cri.sandbox-name": "libertydiag-745db5c657-ghd9h",
+            "io.kubernetes.cri.sandbox-namespace": "default",
+            "io.kubernetes.cri.sandbox-uid": "58126ae1-ca08-4134-bd1d-33b576da4671"
+        },
+        "linux": {
+            "resources": {
+                "devices": [
+                    {
+                        "allow": false,
+                        "access": "rwm"
+                    }
+                ],
+                "memory": {},
+                "cpu": {
+                    "shares": 2,
+                    "period": 100000
+                }
+            },
+            "cgroupsPath": "kubepods-besteffort-pod58126ae1_ca08_4134_bd1d_33b576da4671.slice:cri-containerd:2fe433f3264e7cc2ca8bd223d8f69371ad74b7ab17f0fa318d828d0623f163e7",
+            "namespaces": [
+                {
+                    "type": "pid"
+                },
+                {
+                    "type": "ipc",
+                    "path": "/proc/29146/ns/ipc"
+                },
+                {
+                    "type": "uts",
+                    "path": "/proc/29146/ns/uts"
+                },
+                {
+                    "type": "mount"
+                },
+                {
+                    "type": "network",
+                    "path": "/proc/29146/ns/net"
+                }
+            ],
+            "maskedPaths": [
+                "/proc/acpi",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/sys/firmware"
+            ],
+            "readonlyPaths": [
+                "/proc/asound",
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        }
+    }
+}
+
+chroot /host runc --root /run/containerd/runc/k8s.io state $ID
+
+{
+  "ociVersion": "1.0.2-dev",
+  "id": "2fe433f3264e7cc2ca8bd223d8f69371ad74b7ab17f0fa318d828d0623f163e7",
+  "pid": 29199,
+  "status": "running",
+  "bundle": "/run/containerd/io.containerd.runtime.v2.task/k8s.io/2fe433f3264e7cc2ca8bd223d8f69371ad74b7ab17f0fa318d828d0623f163e7",
+  "rootfs": "/run/containerd/io.containerd.runtime.v2.task/k8s.io/2fe433f3264e7cc2ca8bd223d8f69371ad74b7ab17f0fa318d828d0623f163e7/rootfs",
+  "created": "2023-04-18T16:14:03.663700655Z",
+  "annotations": {
+    "io.kubernetes.cri.container-name": "libertydiag",
+    "io.kubernetes.cri.container-type": "container",
+    "io.kubernetes.cri.image-name": "quay.io/ibm/libertydiag:latest",
+    "io.kubernetes.cri.sandbox-id": "6d99bbe0f3e2232b8c16bb7ea938821db81d0a0ade3e4df3e78c0552c6013249",
+    "io.kubernetes.cri.sandbox-name": "libertydiag-745db5c657-ghd9h",
+    "io.kubernetes.cri.sandbox-namespace": "default",
+    "io.kubernetes.cri.sandbox-uid": "58126ae1-ca08-4134-bd1d-33b576da4671"
+  },
+  "owner": ""
+}
+
+/var/log/pods/default_libertydiag-745db5c657-ghd9h_58126ae1-ca08-4134-bd1d-33b576da4671/libertydiag/0.log

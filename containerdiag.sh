@@ -1,6 +1,6 @@
 #!/bin/sh
 # /*******************************************************************************
-#  * (c) Copyright IBM Corporation 2022.
+#  * (c) Copyright IBM Corporation 2023.
 #  *
 #  * Licensed under the Apache License, Version 2.0 (the "License");
 #  * you may not use this file except in compliance with the License.
@@ -50,6 +50,10 @@ use_kubectl() {
   CTL_DEBUG_FLAGS="-it"
 }
 
+command_exists() {
+  command -v "${1}" >/dev/null 2>&1
+}
+
 OPTIND=1
 while getopts "d:hi:kn:p:qv?" opt; do
   case "$opt" in
@@ -90,10 +94,6 @@ if [ "${1:-}" = "--" ]; then
   shift
 fi
 
-command_exists() {
-  command -v "${1}" >/dev/null 2>&1
-}
-
 if ! command_exists oc && ! command_exists kubectl ; then
   echo "ERROR: Could not find the command oc or kubectl on PATH"
   exit 1
@@ -121,7 +121,7 @@ printVerbose() {
 
 printInfo "Script version ${VERSION} started with ${CTL} and ${IMAGE}"
 
-[ "${VERBOSE}" -eq "1" ] && printVerbose "Commands: ${*1}"
+[ "${VERBOSE}" -eq "1" ] && printVerbose "Commands: ${*}"
 
 # We'll need the namespace, so if they haven't specified it
 # get the current one
