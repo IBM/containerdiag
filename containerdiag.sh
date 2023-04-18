@@ -63,6 +63,10 @@ while getopts "d:hi:kn:p:qv?" opt; do
       IMAGE="${OPTARG}"
       ;;
     k)
+      if ! command_exists kubectl ; then
+        echo "ERROR: Could not find the command kubectl on PATH"
+        exit 1
+      fi
       use_kubectl
       ;;
     n)
