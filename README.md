@@ -12,52 +12,17 @@ This `containerdiag` image may be used to run a worker node debug pod with the d
 
 ## Examples
 
-For additional details, see <https://www.ibm.com/support/pages/mustgather-performance-hang-or-high-cpu-issues-websphere-application-server-linux-containers>
-
-### WebSphere Liberty performance, hang, or high CPU issues
-
-Execute the [WebSphere Performance, hang, or high CPU issues MustGather](https://www.ibm.com/support/pages/mustgather-performance-hang-or-high-cpu-issues-websphere-application-server-linux), execute [`server dump`](https://www.ibm.com/docs/en/was-liberty/core?topic=line-generating-liberty-server-dump-from-command), gather Liberty logs, configuration, the MustGather output, javacores, and any server dumps, and finally delete the javacores and any server dumps.
-
-Replace `$NODE` with the node name and `$PODS` with the pod names (space-delimited):
-
-```
-oc debug node/$NODE -t --image=quay.io/ibm/containerdiag -- libertyperf.sh $PODS
-```
-
-### WebSphere Application Server traditional Base performance, hang, or high CPU issues
-
-Execute the [WebSphere Performance, hang, or high CPU issues MustGather](https://www.ibm.com/support/pages/mustgather-performance-hang-or-high-cpu-issues-websphere-application-server-linux), gather WAS traditional logs, configuration, the MustGather output, and javacores, and finally delete the javacores.
-
-Replace `$NODE` with the node name and `$PODS` with the pod names (space-delimited):
-
-```
-oc debug node/$NODE -t --image=quay.io/ibm/containerdiag -- twasperf.sh $PODS
-```
-
-### tcpdump
-
-Execute [`tcpdump`](https://www.kernel.org/doc/man-pages/online/pages/man1/tcpdump.1.html) for a specified duration. Replace `$DURATION` with a time in seconds:
-
-```
-oc debug node/$NODE -t --image=quay.io/ibm/containerdiag -- tcpdump.sh -0 $DURATION
-```
-
-### perf
-
-Execute [`perf`](https://www.kernel.org/doc/man-pages/online/pages/man1/perf.1.html) for a specified duration. Replace `$DURATION` with a time in seconds:
-
-```
-oc debug node/$NODE -t --image=quay.io/ibm/containerdiag -- perf.sh -d $DURATION
-```
+For details, see <https://www.ibm.com/support/pages/mustgather-performance-hang-or-high-cpu-issues-websphere-application-server-linux-containers>
 
 ## Support
 
-This image is provided as is without any warranty or support but we will do our best to respond to issues as time permits.
+This image is provided as is without any warranty or support but we will do our best to respond to [issues reported in GitHub](https://github.com/IBM/containerdiag/issues) as time permits.
 
 ## Development
 
 ### Steps to publish a new image to Quay
 
+1. Update the date in the `VERSION=` line in `run.sh`
 1. On macOS using `podman`, for the first time using a `podman machine`, install `qemu-user-static` for cross-compilation:
    ```
    podman machine ssh "sudo rpm-ostree install qemu-user-static; sudo systemctl reboot"

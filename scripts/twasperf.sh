@@ -21,7 +21,9 @@ usage() {
   cat <<"EOF"
              -c: Path to javacores (default /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/javacore*)
              -d: DELAY (for run.sh)
+             -f: Configuration directory (default /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/config/)
              -j: JAVACORE_INTERVAL for linperf.sh
+             -l: Logs directory (default /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/logs/)
              -m: VMSTAT_INTERVAL for linperf.sh
              -n: No download necessary (for run.sh)
              -s: SCRIPT_SPAN for linperf.sh
@@ -48,9 +50,11 @@ TOP_INTERVAL=""
 TOP_DASH_H_INTERVAL=""
 VMSTAT_INTERVAL=""
 JAVACORE_PATH="/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/javacore*"
+LOGS_DIR="/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/logs/"
+CONFIG_DIR="/opt/IBM/WebSphere/AppServer/profiles/AppSrv01/config/"
 
 OPTIND=1
-while getopts "c:d:hj:m:ns:t:u:vz?" opt; do
+while getopts "c:d:f:hj:l:m:ns:t:u:vz?" opt; do
   case "$opt" in
     c)
       JAVACORE_PATH="${OPTARG}"
@@ -58,11 +62,17 @@ while getopts "c:d:hj:m:ns:t:u:vz?" opt; do
     d)
       DELAY="-d ${OPTARG}"
       ;;
+    f)
+      CONFIG_DIR="${OPTARG}"
+      ;;
     h|\?)
       usage
       ;;
     j)
       JAVACORE_INTERVAL="-j ${OPTARG}"
+      ;;
+    l)
+      LOGS_DIR="${OPTARG}"
       ;;
     m)
       VMSTAT_INTERVAL="-m ${OPTARG}"
@@ -104,4 +114,4 @@ for ARG in "${@}"; do
   PODARGS="${PODARGS} -p ${ARG}"
 done
 
-run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "linperf.sh -q ${SCRIPT_SPAN} ${JAVACORE_INTERVAL} ${TOP_INTERVAL} ${TOP_DASH_H_INTERVAL} ${VMSTAT_INTERVAL} $(podinfo.sh ${VERBOSE} -j -p ${@}) && podfscp.sh ${VERBOSE} -s ${PODARGS} /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/logs/ /opt/IBM/WebSphere/AppServer/profiles/AppSrv01/config/ ${JAVACORE_PATH} ; podfsrm.sh ${VERBOSE} ${PODARGS} ${JAVACORE_PATH}"
+run.sh ${DELAY} ${NODOWNLOAD} ${VERBOSE} ${SKIPSTATS} sh -c "linperf.sh -q ${SCRIPT_SPAN} ${JAVACORE_INTERVAL} ${TOP_INTERVAL} ${TOP_DASH_H_INTERVAL} ${VMSTAT_INTERVAL} $(podinfo.sh ${VERBOSE} -j -p ${@}) && podfscp.sh ${VERBOSE} -s ${PODARGS} ${LOGS_DIR} ${CONFIG_DIR} ${JAVACORE_PATH} ; podfsrm.sh ${VERBOSE} ${PODARGS} ${JAVACORE_PATH}"
