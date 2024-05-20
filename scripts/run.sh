@@ -31,7 +31,7 @@ EOF
   exit 2
 }
 
-VERSION="0.1.20230426"
+VERSION="0.1.20240520"
 DESTDIR="/tmp"
 VERBOSE=0
 PASSVERBOSE=""
@@ -262,11 +262,11 @@ if [ "${NODOWNLOAD}" -eq "0" ]; then
   while true; do
     echo "[$(date '+%Y-%m-%d %H:%M:%S.%N %Z')] $(basename "${0}"): Files are ready for download using one of the following commands in another window:"
     echo ""
-    echo "  oc cp ${DEBUGPODNAME}:${TARFILE} $(basename "${TARFILE}") --namespace=${DEBUGPODNAMESPACE}"
+    echo "  oc cp ${DEBUGPODNAME}:${TARFILE} $(basename "${TARFILE}") --namespace=${DEBUGPODNAMESPACE} --retries=999"
     echo ""
     echo "OR"
     echo ""
-    echo "  kubectl cp ${DEBUGPODNAME}:${TARFILE} $(basename "${TARFILE}") --namespace=${DEBUGPODNAMESPACE}"
+    echo "  kubectl cp ${DEBUGPODNAME}:${TARFILE} $(basename "${TARFILE}") --namespace=${DEBUGPODNAMESPACE} --retries=999"
     echo ""
     # We don't just allow a lone ENTER because admins often press ENTER during script execution
     # to visually space output, and those get queued up in the input buffer and would end up
