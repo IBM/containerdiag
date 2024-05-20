@@ -128,7 +128,8 @@ RUN get_git() { \
     get_git kgibm problemdetermination && \
     ln -s /opt/problemdetermination/scripts/java/j9/j9javacores.awk /usr/local/bin/ && \
     ln -s /opt/problemdetermination/scripts/ihs/ihs_mpmstats.awk /usr/local/bin/ && \
-    ln -s /opt/problemdetermination/scripts/was/twas_pmi_threadpool.awk /usr/local/bin/
+    ln -s /opt/problemdetermination/scripts/was/twas_pmi_threadpool.awk /usr/local/bin/ && \
+    get_git iovisor bcc
 
 # Copy in our various helper scripts and put them on the $PATH
 COPY scripts/*.sh /opt/
