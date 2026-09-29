@@ -1,0 +1,17 @@
+FROM icr.io/appcafe/websphere-traditional
+
+USER root
+RUN dnf install -y gcc make git
+RUN git clone https://github.com/martinpitt/fatrace /usr/local/src/fatrace
+RUN cd /usr/local/src/fatrace && make && make install
+USER was
+
+RUN /work/configure.sh
+
+USER root
+RUN dnf install -y sudo && echo "was ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+USER was
+
+# https://github.com/WASdev/ci.docker.websphere-traditional/blob/main/docker-build/9.0.5.x/Dockerfile-ubi8
+#CMD ["env", "JVM_EXTRA_CMD_ARGS=-Xnoloa", "sudo -E -H -u was /work/start_server.sh"]
+CMD ["env", "JVM_EXTRA_CMD_ARGS=-Xnoloa", "/work/start_server.sh"]

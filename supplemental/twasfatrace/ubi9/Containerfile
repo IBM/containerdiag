@@ -1,0 +1,9 @@
+# Fedora 34 to target UBI9: https://docs.fedoraproject.org/en-US/quick-docs/fedora-and-red-hat-enterprise-linux/
+FROM fedora:28 as build
+RUN dnf install -y @development-tools
+RUN git clone https://github.com/martinpitt/fatrace /usr/local/src/fatrace
+RUN cd /usr/local/src/fatrace && make && make install
+
+FROM icr.io/appcafe/websphere-traditional
+COPY --from=build /usr/local/sbin/fatrace /usr/sbin/
+RUN /work/configure.sh
