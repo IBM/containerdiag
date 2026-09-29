@@ -246,6 +246,7 @@ for ID in $(echo "${CONTAINER_LIST_OUTPUT}" | awk 'NR > 1 && NF > 2 {print $1}')
       fi
     fi
   elif [ "${CONTAINER_RUNTIME}" -eq "${CONTAINER_RUNTIME_CRUN}" ]; then
+    [ "${VERBOSE}" -eq "1" ] && printVerbose "${CONTAINER_RUNTIME_CRUN} processing"
   fi
   
   [ "${VERBOSE}" -eq "1" ] && printVerbose "pid: ${PID}, container: ${CONTAINERNAME}, pod: ${PODNAME}, namespace: ${CONTAINERNAMESPACE}, rootfs: ${ROOTFS}, stdouterr: ${STDOUTERR}"
