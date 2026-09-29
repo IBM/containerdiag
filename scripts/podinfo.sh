@@ -63,11 +63,13 @@ FINDPATH=""
 
 CONTAINER_RUNTIME_RUNC=1
 CONTAINER_RUNTIME_CONTAINERD=2
+CONTAINER_RUNTIME_CRUN=3
 
 # TODO https://github.com/opencontainers/runc/issues/3462#issuecomment-1155422205
 CMD_RUNC="chroot /host runc"
 CMD_CONTAINERD="chroot /host ctr --namespace k8s.io containers"
 CMD_CONTAINERD2="chroot /host runc --root /run/containerd/runc/k8s.io"
+CMD_CRUN="chroot /host crun"
 
 OPTIND=1
 while getopts "cdf:hjnoprv?" opt; do
@@ -137,7 +139,7 @@ RUNCLIST_LINES="$(echo "${CONTAINER_LIST_OUTPUT}" | wc -l)"
 
 [ "${VERBOSE}" -eq "1" ] && printVerbose "runc list lines: ${RUNCLIST_LINES}"
 
-if [ "${RUNCLIST_LINES}" -eq "1" ]; then
+if [ "${RUNCLIST_LINES}" -le "1" ]; then
   # runc list didn't return any containers, so try containerd
 
   [ "${VERBOSE}" -eq "1" ] && printVerbose "Checking container runtime: containerd"
@@ -151,10 +153,26 @@ if [ "${RUNCLIST_LINES}" -eq "1" ]; then
 
   [ "${VERBOSE}" -eq "1" ] && printVerbose "runc list lines: ${CONTAINERDLIST_LINES}"
 
-  if [ "${CONTAINERDLIST_LINES}" -eq "1" ]; then
-    # Unknown container runtime
-    printError "Unknown container runtime. runc and ctr both returned 0 containers. Please re-run with -v and open an issue with the output."
-    exit 1
+  if [ "${CONTAINERDLIST_LINES}" -le "1" ]; then
+    
+    # Try crun
+    [ "${VERBOSE}" -eq "1" ] && printVerbose "Checking container runtime: crun"
+
+    CONTAINER_LIST_OUTPUT="$(${CMD_CRUN} list)"
+
+    [ "${VERBOSE}" -eq "1" ] && printVerbose "crun list: ${CONTAINER_LIST_OUTPUT}"
+
+    CRUNLIST_LINES="$(echo "${CONTAINER_LIST_OUTPUT}" | wc -l)"
+
+    [ "${VERBOSE}" -eq "1" ] && printVerbose "crun list lines: ${CRUNLIST_LINES}"
+
+    if [ "${CRUNLIST_LINES}" -le "1" ]; then
+      printError "Unknown container runtime. runc, ctr, and crun returned no results. Please re-run with -v and open an issue with the output."
+      exit 1
+    else
+      CONTAINER_RUNTIME=${CONTAINER_RUNTIME_CRUN}
+    fi
+
   else
     # Successfully found containerd
     CONTAINER_RUNTIME=${CONTAINER_RUNTIME_CONTAINERD}
@@ -227,6 +245,7 @@ for ID in $(echo "${CONTAINER_LIST_OUTPUT}" | awk 'NR > 1 && NF > 2 {print $1}')
         fi
       fi
     fi
+  elif [ "${CONTAINER_RUNTIME}" -eq "${CONTAINER_RUNTIME_CRUN}" ]; then
   fi
   
   [ "${VERBOSE}" -eq "1" ] && printVerbose "pid: ${PID}, container: ${CONTAINERNAME}, pod: ${PODNAME}, namespace: ${CONTAINERNAMESPACE}, rootfs: ${ROOTFS}, stdouterr: ${STDOUTERR}"
