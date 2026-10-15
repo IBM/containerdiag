@@ -69,7 +69,7 @@ CONTAINER_RUNTIME_CRUN=3
 CMD_RUNC="chroot /host runc"
 CMD_CONTAINERD="chroot /host ctr --namespace k8s.io containers"
 CMD_CONTAINERD2="chroot /host runc --root /run/containerd/runc/k8s.io"
-CMD_CRUN="chroot /host crun"
+CMD_CRUN="chroot /host crun --root /run/crun"
 
 OPTIND=1
 while getopts "cdf:hjnoprv?" opt; do
@@ -246,7 +246,23 @@ for ID in $(echo "${CONTAINER_LIST_OUTPUT}" | awk 'NR > 1 && NF > 2 {print $1}')
       fi
     fi
   elif [ "${CONTAINER_RUNTIME}" -eq "${CONTAINER_RUNTIME_CRUN}" ]; then
-    [ "${VERBOSE}" -eq "1" ] && printVerbose "${CONTAINER_RUNTIME_CRUN} processing"
+
+    [ "${VERBOSE}" -eq "1" ] && printVerbose "${CMD_CRUN} state ${ID}"
+
+    CRUNSTATE="$(${CMD_CRUN} state ${ID} 2>/dev/null)"
+
+    if [ "${?}" -eq "0" ]; then
+      [ "${VERBOSE}" -eq "1" ] && printVerbose "crun state output: ${CRUNSTATE}"
+
+      CRUNSTATEROWS="$(echo "${CRUNSTATE}" | jq -r '.pid, .annotations."io.kubernetes.container.name", .annotations."io.kubernetes.pod.namespace", .annotations."io.kubernetes.pod.name", .rootfs, .annotations."io.kubernetes.cri-o.LogPath"')"
+
+      PID="$(echo "${CRUNSTATEROWS}" | awk 'NR==1')"
+      CONTAINERNAME="$(echo "${CRUNSTATEROWS}" | awk 'NR==2')"
+      CONTAINERNAMESPACE="$(echo "${CRUNSTATEROWS}" | awk 'NR==3')"
+      PODNAME="$(echo "${CRUNSTATEROWS}" | awk 'NR==4')"
+      ROOTFS="$(echo "${CRUNSTATEROWS}" | awk 'NR==5')"
+      STDOUTERR="$(echo "${CRUNSTATEROWS}" | awk 'NR==6')"
+    fi
   fi
   
   [ "${VERBOSE}" -eq "1" ] && printVerbose "pid: ${PID}, container: ${CONTAINERNAME}, pod: ${PODNAME}, namespace: ${CONTAINERNAMESPACE}, rootfs: ${ROOTFS}, stdouterr: ${STDOUTERR}"
